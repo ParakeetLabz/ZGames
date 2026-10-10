@@ -57,16 +57,11 @@
 <script>
 (function () {
   var d = document.getElementById('calc');
-  var stage = 0;
-  var PHRASE1 = 'game x random';
-  var PHRASE2 = 'unlock x it + please';
-  var MSG = 'What Are You Asking?';
-  function clearIfMsg() { if (d.value === 'What?' || d.value === MSG) d.value = ''; }
+  var PHRASE = 'mr x puzzles';
+  function clearIfMsg() { if (d.value === 'What?') d.value = ''; }
   function go() {
     var t = d.value.trim().toLowerCase();
-    if (stage === 0 && t === PHRASE1) { d.value = MSG; stage = 1; return; }
-    if (stage === 1 && t === PHRASE2) { try { sessionStorage.setItem('zgate', '1'); } catch (e) {} location.href = 'hub.html'; return; }
-    if (stage === 1) { d.value = 'What?'; stage = 0; return; }
+    if (t === PHRASE) { try { sessionStorage.setItem('zgate', '1'); } catch (e) {} location.href = 'hub.html'; return; }
     var expr = d.value.trim().replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
     if (!expr || !/^[0-9+\-*/.() ]+$/.test(expr)) { d.value = 'What?'; return; }
     try {
@@ -78,7 +73,7 @@
   document.querySelectorAll('.cbtns button').forEach(function (b) {
     b.addEventListener('click', function () {
       var v = b.dataset.v;
-      if (v === 'C') { d.value = ''; stage = 0; }
+      if (v === 'C') { d.value = ''; }
       else if (v === '=') go();
       else { clearIfMsg(); d.value += v; }
       d.focus();
