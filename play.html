@@ -13,7 +13,7 @@
 .loader-inner{text-align:center}
 .loader-z{font:900 92px/1 system-ui,-apple-system,sans-serif;color:#fff;text-shadow:0 8px 28px rgba(0,0,0,.45);animation:zbounce .65s cubic-bezier(.35,0,.65,1) infinite alternate}
 @keyframes zbounce{from{transform:translateY(-28px)}to{transform:translateY(8px)}}
-.loader-word{color:#fff;font:800 32px/1.2 system-ui,-apple-system,sans-serif;letter-spacing:3px;margin-top:4px}
+.loader-word{color:#fff;font:800 32px/1.2 system-ui,-apple-system,sans-serif;letter-spacing:3px;margin-top:4px;transform-origin:top center;animation:wordsquash .65s cubic-bezier(.35,0,.65,1) infinite alternate}@keyframes wordsquash{from{transform:scale(1,1)}to{transform:scale(1.07,.72)}}
 </style>
 </head>
 <body>
