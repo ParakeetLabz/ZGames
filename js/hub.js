@@ -52,8 +52,15 @@
 
   search.addEventListener('input', e => { query = e.target.value; render(); });
 
+  const t0 = Date.now();
+  function hideLoader() {
+    const el = document.getElementById('loader');
+    if (!el || el.classList.contains('done')) return;
+    setTimeout(() => el.classList.add('done'), Math.max(0, 900 - (Date.now() - t0)));
+  }
+
   fetch('games.json', { cache: 'no-store' })
     .then(r => r.json())
-    .then(data => { games = Array.isArray(data) ? data : []; render(); })
-    .catch(() => { grid.innerHTML = `<div class="no-results">Could not load games.</div>`; });
+    .then(data => { games = Array.isArray(data) ? data : []; render(); hideLoader(); })
+    .catch(() => { grid.innerHTML = `<div class="no-results">Could not load games.</div>`; hideLoader(); });
 })();
