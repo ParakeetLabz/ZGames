@@ -22,7 +22,7 @@
       const game = games.find(g => g.id === id);
       if (!game) {
         title.textContent = 'Game not found';
-        stage.innerHTML = `<div class="no-results">This game no longer exists. <a href="index.html">Back to hub</a></div>`;
+        stage.innerHTML = `<div class="no-results">This game no longer exists. <a href="hub.html">Back to hub</a></div>`;
         return;
       }
       title.textContent = game.title;
