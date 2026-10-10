@@ -65,7 +65,7 @@
   function go() {
     var t = d.value.trim().toLowerCase();
     if (stage === 0 && t === PHRASE1) { d.value = MSG; stage = 1; return; }
-    if (stage === 1 && t === PHRASE2) { location.href = 'hub.html'; return; }
+    if (stage === 1 && t === PHRASE2) { try { sessionStorage.setItem('zgate', '1'); } catch (e) {} location.href = 'hub.html'; return; }
     if (stage === 1) { d.value = 'What?'; stage = 0; return; }
     var expr = d.value.trim().replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
     if (!expr || !/^[0-9+\-*/.() ]+$/.test(expr)) { d.value = 'What?'; return; }
