@@ -43,5 +43,14 @@
     "icon": "",
     "kind": "url",
     "url": "https://snow-rider-1.vercel.app/"
+  },
+  {
+    "id": "undertale-icp6",
+    "title": "Undertale",
+    "category": "Other",
+    "description": "Is it Under the Tale?",
+    "icon": "https://static.cdnlogo.com/logos/u/65/undertale.svg",
+    "kind": "url",
+    "url": "https://undertale-beige.vercel.app/"
   }
 ]
