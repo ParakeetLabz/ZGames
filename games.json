@@ -43,5 +43,14 @@
     "icon": "",
     "kind": "url",
     "url": "https://snow-rider-1.vercel.app/"
+  },
+  {
+    "id": "test-pkmx",
+    "title": "Test",
+    "category": "Other",
+    "description": "",
+    "icon": "",
+    "kind": "url",
+    "url": "https://zaydshub.com/"
   }
 ]
