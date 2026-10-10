@@ -68,6 +68,14 @@
     </div>
 
     <div class="panel">
+      <h2>🔑 Supabase (accounts)</h2>
+      <label>Supabase URL<input id="sbUrl" type="url" placeholder="https://xyz.supabase.co"></label>
+      <label>Anon public key<input id="sbKey" type="text" placeholder="eyJ…" autocomplete="off"></label>
+      <button id="saveSb" class="btn btn-p">Save</button>
+      <p class="hint">Writes js/supabase-config.js in the repo. Setup steps: SUPABASE.md</p>
+    </div>
+
+    <div class="panel">
       <h2 id="formTitle">➕ Add a game</h2>
       <form id="gameForm">
         <div class="grid2">
@@ -104,7 +112,7 @@ $('pinBtn').onclick = () => {
 };
 $('pin').addEventListener('keydown', e => { if (e.key === 'Enter') $('pinBtn').click(); });
 
-function unlock() { $('gate').hidden = true; $('app').hidden = false; loadCfg(); refresh(); }
+function unlock() { $('gate').hidden = true; $('app').hidden = false; loadCfg(); refresh(); loadSb(); }
 function loadCfg() {
   $('owner').value = localStorage.getItem('zg_owner') || 'IAmTheGamer-sigma';
   $('repo').value = localStorage.getItem('zg_repo') || 'GameHub';
@@ -200,8 +208,37 @@ function resetForm() {
 }
 $('cancelEdit').onclick = resetForm;
 
-$('gameForm').onsubmit = async e => {
-  e.preventDefault();
+/* ---------- Supabase config ---------- */
+async function loadSb() {
+  try {
+    const { owner, repo } = cfg();
+    if (!owner || !repo || !cfg().pat) return;
+    const f = await gh(`/repos/${owner}/${repo}/contents/js/supabase-config.js`);
+    const txt = b64d(f.content.replace(/\n/g, ''));
+    const u = txt.match(/url:\s*['"]([^'"]*)['"]/);
+    const k = txt.match(/anonKey:\s*['"]([^'"]*)['"]/);
+    if (u) $('sbUrl').value = u[1];
+    if (k) $('sbKey').value = k[1];
+  } catch (e) {}
+}
+$('saveSb').onclick = async () => {
+  const url = $('sbUrl').value.trim().replace(/'/g, "\\'");
+  const key = $('sbKey').value.trim().replace(/'/g, "\\'");
+  const content = `/* Z Games Supabase config — set via the admin panel (Supabase section). */
+/* The anon key is public by design; RLS policies protect the data. */
+window.ZG_SUPABASE = {
+  url: '${url}',
+  anonKey: '${key}'
+};
+`;
+  try {
+    status('Saving Supabase config…');
+    await putFile('js/supabase-config.js', b64e(content), 'Update Supabase config');
+    status('Saved ✓ — accounts go live after Netlify rebuilds (~1 min)');
+  } catch (err) { status('Error: ' + err.message); }
+};
+
+$('gameForm').onsubmit = async e => {  e.preventDefault();
   const title = $('fTitle').value.trim();
   if (!title) return alert('Title needed');
   const url = $('fUrl').value.trim();
