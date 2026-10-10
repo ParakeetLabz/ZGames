@@ -1,7 +1,9 @@
 # Z Games — Commands & Codes
 
 ## Unlock the hub
-On the home page calculator, type `x` and press `=`.
+Two steps, in the home page calculator:
+1. Type `Game x Random` and press `=` → it asks "What Are You Asking?"
+2. Type `unlock x it + please` and press `=` → the hub opens.
 (Anything else just shows "What?".)
 
 ## Admin panel
