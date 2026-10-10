@@ -57,10 +57,17 @@
 <script>
 (function () {
   var d = document.getElementById('calc');
+  var stage = 0;
+  var PHRASE1 = 'game x random';
+  var PHRASE2 = 'unlock x it + please';
+  var MSG = 'What Are You Asking?';
+  function clearIfMsg() { if (d.value === 'What?' || d.value === MSG) d.value = ''; }
   function go() {
-    var t = d.value.trim();
-    if (t.toLowerCase() === 'x') { location.href = 'hub.html'; return; }
-    var expr = t.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+    var t = d.value.trim().toLowerCase();
+    if (stage === 0 && t === PHRASE1) { d.value = MSG; stage = 1; return; }
+    if (stage === 1 && t === PHRASE2) { location.href = 'hub.html'; return; }
+    if (stage === 1) { d.value = 'What?'; stage = 0; return; }
+    var expr = d.value.trim().replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
     if (!expr || !/^[0-9+\-*/.() ]+$/.test(expr)) { d.value = 'What?'; return; }
     try {
       var r = Function('"use strict";return (' + expr + ')')();
@@ -71,12 +78,9 @@
   document.querySelectorAll('.cbtns button').forEach(function (b) {
     b.addEventListener('click', function () {
       var v = b.dataset.v;
-      if (v === 'C') d.value = '';
+      if (v === 'C') { d.value = ''; stage = 0; }
       else if (v === '=') go();
-      else {
-        if (d.value === 'What?') d.value = '';
-        d.value += v;
-      }
+      else { clearIfMsg(); d.value += v; }
       d.focus();
     });
   });
