@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Play · Z Games</title>
+<link rel="icon" href="assets/logo.jpg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html">
+    <img src="assets/logo.jpg" alt="Z Games logo">
+    <span class="brand-name">Z Games</span>
+  </a>
+  <h1 id="gameTitle" class="play-title">Loading…</h1>
+  <div class="spacer"></div>
+  <button id="fsBtn" class="btn btn-ghost">⛶ Fullscreen</button>
+  <a id="newTab" class="btn btn-ghost" target="_blank" rel="noopener" hidden>↗ New tab</a>
+</header>
+<main class="play-main">
+  <div id="stage" class="stage"><iframe id="frame" title="game" allowfullscreen></iframe></div>
+  <h2 class="more-head">More games</h2>
+  <div id="more" class="grid small"></div>
+</main>
+<script src="js/play.js"></script>
+</body>
+</html>
