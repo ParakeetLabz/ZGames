@@ -1,1 +1,47 @@
-[{"category":"Arcade","description":"","icon":"","id":"angry-birds","kind":"url","title":"Angry Birds","url":"https://angry-birds-theta-jade.vercel.app/"},{"category":"Other","description":"A Proxy","icon":"","id":"gust","kind":"url","title":"GUST","url":"https://gust-zeta.vercel.app/"},{"category":"Arcade","description":"A Multiplayer blocky game","icon":"","id":"funtopia","kind":"url","title":"FunTopia","url":"https://friendfun.onrender.com/"},{"category":"Other","description":"A chatting app for FunTopia","icon":"","id":"funworxs","kind":"url","title":"FunWorxs","url":"https://funworxs.onrender.com/"}]
+[
+  {
+    "category": "Arcade",
+    "description": "",
+    "icon": "",
+    "id": "angry-birds",
+    "kind": "url",
+    "title": "Angry Birds",
+    "url": "https://angry-birds-theta-jade.vercel.app/"
+  },
+  {
+    "category": "Other",
+    "description": "A Proxy",
+    "icon": "",
+    "id": "gust",
+    "kind": "url",
+    "title": "GUST",
+    "url": "https://gust-zeta.vercel.app/"
+  },
+  {
+    "category": "Arcade",
+    "description": "A Multiplayer blocky game",
+    "icon": "",
+    "id": "funtopia",
+    "kind": "url",
+    "title": "FunTopia",
+    "url": "https://friendfun.onrender.com/"
+  },
+  {
+    "category": "Other",
+    "description": "A chatting app for FunTopia",
+    "icon": "",
+    "id": "funworxs",
+    "kind": "url",
+    "title": "FunWorxs",
+    "url": "https://funworxs.onrender.com/"
+  },
+  {
+    "id": "snow-rider-shpn",
+    "title": "Snow Rider",
+    "category": "Other",
+    "description": "",
+    "icon": "",
+    "kind": "url",
+    "url": "https://snow-rider-1.vercel.app/"
+  }
+]
