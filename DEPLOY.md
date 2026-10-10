@@ -21,7 +21,7 @@ Two ways — pick one.
 ## Useful URLs
 
 - Home (disguised): `your-site.netlify.app/`
-- Unlock: type **x** in the calculator, press **=**
+- Unlock: in the calculator type `Game x Random` → `=` → then `unlock x it + please` → `=`
 - Admin panel: `your-site.netlify.app/zg-admin-4173.html` (PIN: 4173)
 
 ## Custom domain (optional)
