@@ -1,0 +1,3 @@
+# InfinityFree / Apache: /studyplace serves the disguise page (cover mode)
+RewriteEngine On
+RewriteRule ^studyplace/?$ index.html [L]
