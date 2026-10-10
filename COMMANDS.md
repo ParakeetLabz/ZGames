@@ -35,3 +35,10 @@ Click **Delete** → confirm. Removes it from the catalog
 ## After saving
 Netlify rebuilds automatically in ~1 minute (repo-connected sites),
 or re-drag the folder (manual deploys).
+
+## Player accounts (Supabase)
+One-time setup — see **SUPABASE.md**:
+1. supabase.com → new project → run `supabase-setup.sql` in SQL Editor
+2. Auth → Providers → Email → turn OFF "Confirm email"
+3. Copy Project URL + anon key → admin panel → Supabase section → Save
+Players then sign up with username + password (+ optional avatar).
