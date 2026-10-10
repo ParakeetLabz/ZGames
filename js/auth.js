@@ -112,7 +112,7 @@
   async function refresh() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) {
-      wrap.innerHTML = `<button id="accountBtn" class="btn btn-ghost">👤 Account</button>`;
+      wrap.innerHTML = `<button id="accountBtn" class="btn btn-primary">Sign in</button>`;
       document.getElementById('accountBtn').addEventListener('click', () => { showTab('login'); openModal(); });
       return;
     }
