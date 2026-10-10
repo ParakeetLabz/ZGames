@@ -61,5 +61,14 @@
     "icon": "",
     "kind": "url",
     "url": "https://gim.villiansrule.xyz"
+  },
+  {
+    "id": "retro-bowl-vsup",
+    "title": "Retro Bowl",
+    "category": "Arcade",
+    "description": "Football but RETRO???",
+    "icon": "https://upload.wikimedia.org/wikipedia/en/b/bf/Retro_Bowl_cover.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail_unscaled",
+    "kind": "url",
+    "url": "https://retro-bowl-blue.vercel.app/"
   }
 ]
