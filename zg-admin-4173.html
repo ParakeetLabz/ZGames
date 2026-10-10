@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hub Admin</title>
+<style>
+  :root { --bg:#040918; --panel:#0e1a3d; --line:#1e3a7a; --text:#e8f1ff;
+    --muted:#8fa8d8; --blue:#1e90ff; --cyan:#00d4ff; --danger:#ff5470; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,sans-serif; background:var(--bg); color:var(--text);
+    min-height:100vh; display:flex; justify-content:center; padding:32px 16px; }
+  .wrap { width:100%; max-width:680px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:22px; margin-bottom:18px; }
+  h2 { margin-bottom:14px; font-size:18px; }
+  label { display:block; margin-bottom:12px; font-size:14px; font-weight:600; }
+  input[type=text], input[type=url], input[type=password], textarea {
+    width:100%; margin-top:6px; background:var(--bg); border:1px solid var(--line);
+    color:var(--text); border-radius:10px; padding:10px 14px; font-size:14px; outline:none; }
+  input:focus, textarea:focus { border-color:var(--blue); }
+  .hint { font-size:12px; color:var(--muted); font-weight:400; margin-top:6px; }
+  .btn { border:none; cursor:pointer; border-radius:10px; padding:10px 18px;
+    font-size:14px; font-weight:700; margin-right:8px; margin-top:4px; }
+  .btn-p { background:linear-gradient(135deg,#0b5ed7,var(--blue)); color:#fff; }
+  .btn-g { background:#142450; color:var(--text); border:1px solid var(--line); }
+  .btn-d { background:rgba(255,84,112,.12); color:var(--danger); border:1px solid rgba(255,84,112,.4); }
+  .row { display:flex; align-items:center; gap:12px; background:var(--bg);
+    border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:10px; }
+  .row img.thumb { width:48px; height:48px; border-radius:12px; object-fit:cover; }
+  .row .fb { width:48px; height:48px; border-radius:12px; display:flex; align-items:center;
+    justify-content:center; font-size:22px; font-weight:800; color:#fff;
+    background:linear-gradient(135deg,#0b5ed7,var(--cyan)); }
+  .row-info { flex:1; min-width:0; }
+  .row-title { font-weight:700; font-size:14px; }
+  .row-sub { font-size:12px; color:var(--muted); word-break:break-all; }
+  #status { font-size:13px; color:var(--cyan); margin-top:10px; min-height:18px; }
+  #gate { text-align:center; padding-top:10vh; }
+  #gate input { max-width:220px; margin:12px auto 0; text-align:center; font-size:20px;
+    letter-spacing:8px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:0 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="gate" class="panel">
+    <h2>🔒 Hub Admin</h2>
+    <p class="hint">Enter PIN</p>
+    <input id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off">
+    <div><button id="pinBtn" class="btn btn-p">Unlock</button></div>
+    <p id="gateMsg" class="hint"></p>
+  </div>
+
+  <div id="app" hidden>
+    <div class="panel">
+      <h2>⚙️ GitHub connection</h2>
+      <div class="grid2">
+        <label>Owner<input id="owner" type="text" placeholder="IAmTheGamer-sigma"></label>
+        <label>Repo<input id="repo" type="text" placeholder="GameHub"></label>
+      </div>
+      <label>Personal Access Token (repo scope)
+        <input id="pat" type="password" placeholder="ghp_…" autocomplete="off">
+        <span class="hint">Saved only in this browser. Create at github.com → Settings → Developer settings → Personal access tokens (classic), with <b>repo</b> scope.</span>
+      </label>
+      <button id="saveCfg" class="btn btn-p">Save &amp; Load Games</button>
+      <div id="status"></div>
+    </div>
+
+    <div class="panel">
+      <h2 id="formTitle">➕ Add a game</h2>
+      <form id="gameForm">
+        <div class="grid2">
+          <label>Title<input id="fTitle" type="text" required maxlength="60"></label>
+          <label>Category<input id="fCat" type="text" placeholder="Arcade"></label>
+        </div>
+        <label>Description<input id="fDesc" type="text" maxlength="140"></label>
+        <label>Icon — image URL<input id="fIconUrl" type="url" placeholder="https://…"></label>
+        <label>Icon — or upload image<input id="fIconFile" type="file" accept="image/*"></label>
+        <label>Game URL (embedded)<input id="fUrl" type="url" placeholder="https://…"></label>
+        <label>Game — or upload .html file<input id="fGameFile" type="file" accept=".html,text/html"></label>
+        <button class="btn btn-p" type="submit" id="saveBtn">Add Game</button>
+        <button class="btn btn-g" type="button" id="cancelEdit" hidden>Cancel</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>🎮 Games</h2>
+      <div id="gameList"></div>
+    </div>
+  </div>
+
+</div>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const PIN = '4173'; // obscurity only
+const status = m => { $('status').textContent = m; };
+
+if (sessionStorage.getItem('zg_admin') === '1') unlock();
+$('pinBtn').onclick = () => {
+  if ($('pin').value === PIN) { sessionStorage.setItem('zg_admin', '1'); unlock(); }
+  else $('gateMsg').textContent = 'Wrong PIN';
+};
+$('pin').addEventListener('keydown', e => { if (e.key === 'Enter') $('pinBtn').click(); });
+
+function unlock() { $('gate').hidden = true; $('app').hidden = false; loadCfg(); refresh(); }
+function loadCfg() {
+  $('owner').value = localStorage.getItem('zg_owner') || 'IAmTheGamer-sigma';
+  $('repo').value = localStorage.getItem('zg_repo') || 'GameHub';
+  $('pat').value = localStorage.getItem('zg_pat') || '';
+}
+$('saveCfg').onclick = () => {
+  localStorage.setItem('zg_owner', $('owner').value.trim());
+  localStorage.setItem('zg_repo', $('repo').value.trim());
+  localStorage.setItem('zg_pat', $('pat').value.trim());
+  refresh();
+};
+const cfg = () => ({ owner: $('owner').value.trim(), repo: $('repo').value.trim(), pat: $('pat').value.trim() });
+
+async function gh(path, method, body) {
+  const { pat } = cfg();
+  if (!pat) throw new Error('Add your Personal Access Token first.');
+  const r = await fetch('https://api.github.com' + path, {
+    method: method || 'GET',
+    headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!r.ok) throw new Error('GitHub ' + r.status + ': ' + (await r.text()).slice(0, 180));
+  return r.status === 204 ? null : r.json();
+}
+const b64e = s => btoa(String.fromCharCode(...new TextEncoder().encode(s)));
+const b64d = b => new TextDecoder().decode(Uint8Array.from(atob(b), c => c.charCodeAt(0)));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+let catalog = [], catalogSha = null, editingId = null;
+let iconUpload = null, gameUpload = null;
+
+const readB64 = file => new Promise((res, rej) => {
+  const r = new FileReader();
+  r.onload = () => res(String(r.result).split(',')[1]);
+  r.onerror = rej;
+  r.readAsDataURL(file);
+});
+$('fIconFile').onchange = async e => {
+  const f = e.target.files[0];
+  iconUpload = f ? { name: f.name, b64: await readB64(f) } : null;
+};
+$('fGameFile').onchange = async e => {
+  const f = e.target.files[0];
+  gameUpload = f ? { b64: await readB64(f) } : null;
+};
+
+async function refresh() {
+  const { owner, repo } = cfg();
+  if (!owner || !repo) { status('Enter owner + repo, then Save & Load.'); return; }
+  try {
+    status('Loading games.json…');
+    const f = await gh(`/repos/${owner}/${repo}/contents/games.json`);
+    catalogSha = f.sha;
+    catalog = JSON.parse(b64d(f.content.replace(/\n/g, '')));
+    status(`Loaded ${catalog.length} games ✓`);
+  } catch (e) {
+    catalog = []; catalogSha = null;
+    status('Note: ' + e.message + ' — saving will create games.json.');
+  }
+  renderList();
+}
+
+async function putFile(path, b64, msg) {
+  const { owner, repo } = cfg();
+  let sha = null;
+  try { sha = (await gh(`/repos/${owner}/${repo}/contents/${path}`)).sha; } catch (e) {}
+  const body = { message: msg, content: b64 };
+  if (sha) body.sha = sha;
+  await gh(`/repos/${owner}/${repo}/contents/${path}`, 'PUT', body);
+}
+async function delFile(path, msg) {
+  const { owner, repo } = cfg();
+  try {
+    const sha = (await gh(`/repos/${owner}/${repo}/contents/${path}`)).sha;
+    await gh(`/repos/${owner}/${repo}/contents/${path}`, 'DELETE', { message: msg, sha });
+  } catch (e) {}
+}
+async function saveCatalog(msg) {
+  const { owner, repo } = cfg();
+  const body = { message: msg, content: b64e(JSON.stringify(catalog, null, 2)) };
+  if (catalogSha) body.sha = catalogSha;
+  const f = await gh(`/repos/${owner}/${repo}/contents/games.json`, 'PUT', body);
+  catalogSha = f.content.sha;
+}
+
+function resetForm() {
+  $('gameForm').reset();
+  editingId = null; iconUpload = null; gameUpload = null;
+  $('formTitle').textContent = '➕ Add a game';
+  $('saveBtn').textContent = 'Add Game';
+  $('cancelEdit').hidden = true;
+}
+$('cancelEdit').onclick = resetForm;
+
+$('gameForm').onsubmit = async e => {
+  e.preventDefault();
+  const title = $('fTitle').value.trim();
+  if (!title) return alert('Title needed');
+  const url = $('fUrl').value.trim();
+  if (!url && !gameUpload) return alert('Add a game URL or upload an .html file.');
+  const id = editingId || (title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') +
+    '-' + Math.random().toString(36).slice(2, 6));
+  try {
+    status('Working…');
+    let icon = $('fIconUrl').value.trim();
+    let kind = 'url', finalUrl = url;
+    if (iconUpload) {
+      const ext = (iconUpload.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
+      const p = `icons/${id}.${ext}`;
+      await putFile(p, iconUpload.b64, `Icon for ${title}`);
+      icon = p;
+    }
+    if (gameUpload) {
+      const p = `games/${id}/index.html`;
+      await putFile(p, gameUpload.b64, `Game files for ${title}`);
+      kind = 'file'; finalUrl = p;
+    }
+    const entry = { id, title, category: $('fCat').value.trim() || 'Other',
+      description: $('fDesc').value.trim(), icon, kind, url: finalUrl };
+    catalog = editingId ? catalog.map(g => g.id === editingId ? entry : g) : [...catalog, entry];
+    await saveCatalog((editingId ? 'Update ' : 'Add ') + title);
+    status('Saved ✓ — live after Netlify rebuilds (auto, ~1 min)');
+    resetForm(); renderList();
+  } catch (err) { status('Error: ' + err.message); }
+};
+
+function thumb(g) {
+  if (g.icon) return `<img class="thumb" src="${esc(g.icon)}" alt="">`;
+  const ch = esc((g.title || '?').trim().charAt(0).toUpperCase() || '?');
+  return `<div class="fb">${ch}</div>`;
+}
+
+function renderList() {
+  if (!catalog.length) { $('gameList').innerHTML = '<p class="hint">No games yet.</p>'; return; }
+  $('gameList').innerHTML = catalog.map(g => `
+    <div class="row">${thumb(g)}
+      <div class="row-info">
+        <div class="row-title">${esc(g.title)}</div>
+        <div class="row-sub">${esc(g.category || '')} · ${g.kind === 'file' ? 'uploaded' : 'link'} · ${esc(g.url)}</div>
+      </div>
+      <button class="btn btn-g" data-edit="${g.id}">Edit</button>
+      <button class="btn btn-d" data-del="${g.id}">Delete</button>
+    </div>`).join('');
+  $('gameList').querySelectorAll('[data-edit]').forEach(b =>
+    b.onclick = () => startEdit(b.dataset.edit));
+  $('gameList').querySelectorAll('[data-del]').forEach(b =>
+    b.onclick = async () => {
+      const g = catalog.find(x => x.id === b.dataset.del);
+      if (!confirm(`Delete "${g.title}"?`)) return;
+      try {
+        status('Deleting…');
+        if (g.kind === 'file' && g.url) await delFile(g.url, `Remove game ${g.title}`);
+        if (g.icon && !/^https?:/i.test(g.icon)) await delFile(g.icon, `Remove icon ${g.title}`);
+        catalog = catalog.filter(x => x.id !== g.id);
+        await saveCatalog('Remove ' + g.title);
+        status('Deleted ✓'); renderList();
+      } catch (err) { status('Error: ' + err.message); }
+    });
+}
+
+function startEdit(id) {
+  const g = catalog.find(x => x.id === id);
+  if (!g) return;
+  editingId = id;
+  $('fTitle').value = g.title;
+  $('fCat').value = g.category || '';
+  $('fDesc').value = g.description || '';
+  $('fIconUrl').value = /^https?:/i.test(g.icon || '') ? g.icon : '';
+  $('fUrl').value = g.kind === 'url' ? (g.url || '') : '';
+  iconUpload = null; gameUpload = null;
+  $('formTitle').textContent = '✏️ Edit game';
+  $('saveBtn').textContent = 'Save Changes';
+  $('cancelEdit').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
