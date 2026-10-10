@@ -3,28 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Z Games</title>
-<link rel="icon" href="assets/logo.jpg">
-<link rel="stylesheet" href="css/style.css">
+<meta name="robots" content="noindex, nofollow">
+<title>Study Resources</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, 'Times New Roman', serif; background: #f5f2ea; color: #2c2c2c; min-height: 100vh; }
+  header { background: #1f4d2e; color: #fff; padding: 18px 24px; }
+  header h1 { font-size: 22px; font-weight: 700; }
+  header p { font-size: 13px; opacity: .85; margin-top: 4px; }
+  main { max-width: 720px; margin: 0 auto; padding: 28px 20px 60px; }
+  .links { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin: 18px 0 34px; }
+  .links a { background: #fff; border: 1px solid #d8d2c2; border-radius: 10px; padding: 16px;
+    text-decoration: none; color: #1f4d2e; font-weight: 700; font-size: 14px; text-align: center; }
+  .links a small { display: block; font-weight: 400; color: #777; margin-top: 4px; font-size: 12px; }
+  .calc-wrap { background: #fff; border: 1px solid #d8d2c2; border-radius: 12px; padding: 20px; max-width: 320px; }
+  .calc-wrap h2 { font-size: 17px; margin-bottom: 12px; }
+  #calc { width: 100%; font-size: 22px; padding: 12px; text-align: right; border: 1px solid #c9c2ae;
+    border-radius: 8px; margin-bottom: 10px; font-family: inherit; }
+  .cbtns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .cbtns button { font-size: 18px; padding: 12px 0; border: 1px solid #d8d2c2; border-radius: 8px;
+    background: #faf8f2; cursor: pointer; font-family: inherit; }
+  .cbtns button:active { background: #eee9da; }
+  .cbtns .eq { background: #1f4d2e; color: #fff; border-color: #1f4d2e; }
+  footer { text-align: center; color: #999; font-size: 12px; padding: 20px; }
+</style>
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="index.html">
-    <img src="assets/logo.jpg" alt="Z Games logo">
-    <span class="brand-name">Z Games</span>
-  </a>
-  <input id="search" class="search" type="search" placeholder="Search games...">
+<header>
+  <h1>📚 Study Resources</h1>
+  <p>Homework help, references &amp; study tools</p>
 </header>
 <main>
-  <section class="hero">
-    <img class="hero-logo" src="assets/logo.jpg" alt="Z Games logo">
-    <h1>Pick a game, hit play.</h1>
-    <p>Z Games — a hub of hand-picked browser games.</p>
+  <div class="links">
+    <a href="https://www.khanacademy.org" target="_blank" rel="noopener">Khan Academy<small>Lessons &amp; practice</small></a>
+    <a href="https://www.merriam-webster.com" target="_blank" rel="noopener">Dictionary<small>Definitions</small></a>
+    <a href="https://www.britannica.com" target="_blank" rel="noopener">Britannica<small>Encyclopedia</small></a>
+    <a href="https://www.desmos.com/scientific" target="_blank" rel="noopener">Desmos<small>Graphing</small></a>
+  </div>
+
+  <section class="calc-wrap">
+    <h2>Calculator</h2>
+    <input id="calc" type="text" placeholder="0" autocomplete="off" aria-label="Calculator">
+    <div class="cbtns">
+      <button data-v="7">7</button><button data-v="8">8</button><button data-v="9">9</button><button data-v="÷">÷</button>
+      <button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button><button data-v="×">×</button>
+      <button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="-">−</button>
+      <button data-v="0">0</button><button data-v=".">.</button><button data-v="C">C</button><button data-v="+">+</button>
+      <button data-v="(">(</button><button data-v=")">)</button><button data-v="=" class="eq" style="grid-column: span 2">=</button>
+    </div>
   </section>
-  <nav id="chips" class="chips" aria-label="Categories"></nav>
-  <div id="grid" class="grid"></div>
 </main>
-<footer class="footer">Z Games 🎮</footer>
-<script src="js/hub.js"></script>
+<footer>Study Resources · for school use</footer>
+<script>
+(function () {
+  var d = document.getElementById('calc');
+  function go() {
+    var t = d.value.trim();
+    if (t.toLowerCase() === 'x') { location.href = 'hub.html'; return; }
+    var expr = t.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+    if (!expr || !/^[0-9+\-*/.() ]+$/.test(expr)) { d.value = 'What?'; return; }
+    try {
+      var r = Function('"use strict";return (' + expr + ')')();
+      if (typeof r !== 'number' || !isFinite(r)) throw 0;
+      d.value = String(Math.round(r * 1e10) / 1e10);
+    } catch (e) { d.value = 'What?'; }
+  }
+  document.querySelectorAll('.cbtns button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var v = b.dataset.v;
+      if (v === 'C') d.value = '';
+      else if (v === '=') go();
+      else {
+        if (d.value === 'What?') d.value = '';
+        d.value += v;
+      }
+      d.focus();
+    });
+  });
+  d.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+})();
+</script>
 </body>
 </html>
