@@ -87,5 +87,25 @@
   d.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
 })();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script>
+/* Auto-entry: signed-in users go straight to the hub — unless the URL
+   contains "studyplace" (cover mode: stay on the disguise page). */
+(function () {
+  if (/studyplace/i.test(location.pathname + location.search + location.hash)) return;
+  var cfg = window.ZG_SUPABASE || {};
+  if (!cfg.url || !cfg.anonKey || !window.supabase) return;
+  try {
+    var sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+    sb.auth.getSession().then(function (r) {
+      if (r && r.data && r.data.session) {
+        try { sessionStorage.setItem('zgate', '1'); } catch (e) {}
+        location.replace('hub.html');
+      }
+    }).catch(function () {});
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>
