@@ -8,7 +8,7 @@
 
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const emailOf = u => u.trim().toLowerCase() + '@z-games.local';
+  const emailOf = u => u.trim().toLowerCase() + '@z-games.app'; // .app: real gTLD; GoTrue rejects reserved TLDs like .local
   const validUser = u => /^[a-zA-Z0-9_]{3,16}$/.test(u.trim());
 
   const modal = document.getElementById('authModal');
