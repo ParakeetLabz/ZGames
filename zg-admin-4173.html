@@ -87,6 +87,7 @@
         <label>Icon — or upload image<input id="fIconFile" type="file" accept="image/*"></label>
         <label>Game URL (embedded)<input id="fUrl" type="url" placeholder="https://…"></label>
         <label>Game — or upload .html file<input id="fGameFile" type="file" accept=".html,text/html"></label>
+        <label>Extra servers — one URL per line<textarea id="fServers" rows="2" placeholder="https://backup-server…"></textarea></label>
         <button class="btn btn-p" type="submit" id="saveBtn">Add Game</button>
         <button class="btn btn-g" type="button" id="cancelEdit" hidden>Cancel</button>
       </form>
@@ -262,6 +263,8 @@ $('gameForm').onsubmit = async e => {  e.preventDefault();
     }
     const entry = { id, title, category: $('fCat').value.trim() || 'Other',
       description: $('fDesc').value.trim(), icon, kind, url: finalUrl };
+    const servers = $('fServers').value.split('\n').map(s => s.trim()).filter(Boolean);
+    if (servers.length) entry.servers = servers;
     catalog = editingId ? catalog.map(g => g.id === editingId ? entry : g) : [...catalog, entry];
     await saveCatalog((editingId ? 'Update ' : 'Add ') + title);
     status('Saved ✓ — live after Netlify rebuilds (auto, ~1 min)');
@@ -281,7 +284,7 @@ function renderList() {
     <div class="row">${thumb(g)}
       <div class="row-info">
         <div class="row-title">${esc(g.title)}</div>
-        <div class="row-sub">${esc(g.category || '')} · ${g.kind === 'file' ? 'uploaded' : 'link'} · ${esc(g.url)}</div>
+        <div class="row-sub">${esc(g.category || '')} · ${g.kind === 'file' ? 'uploaded' : 'link'}${(g.servers || []).length ? ' · ' + g.servers.length + ' servers' : ''} · ${esc(g.url)}</div>
       </div>
       <button class="btn btn-g" data-edit="${g.id}">Edit</button>
       <button class="btn btn-d" data-del="${g.id}">Delete</button>
@@ -312,6 +315,7 @@ function startEdit(id) {
   $('fDesc').value = g.description || '';
   $('fIconUrl').value = /^https?:/i.test(g.icon || '') ? g.icon : '';
   $('fUrl').value = g.kind === 'url' ? (g.url || '') : '';
+  $('fServers').value = (g.servers || []).map(s => typeof s === 'string' ? s : s.url).join('\n');
   iconUpload = null; gameUpload = null;
   $('formTitle').textContent = '✏️ Edit game';
   $('saveBtn').textContent = 'Save Changes';
