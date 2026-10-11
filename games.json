@@ -6,7 +6,10 @@
     "description": "",
     "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPmEUzMrGwpyQ9mVdpNG2hlfuWu5FzvPDkRw&s",
     "kind": "url",
-    "url": "https://angry-birds-theta-jade.vercel.app/"
+    "url": "https://angry-birds-theta-jade.vercel.app/",
+    "servers": [
+      "https://gust-zeta.vercel.app"
+    ]
   },
   {
     "id": "gust",
