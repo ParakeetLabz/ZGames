@@ -70,5 +70,14 @@
     "icon": "https://upload.wikimedia.org/wikipedia/en/b/bf/Retro_Bowl_cover.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail_unscaled",
     "kind": "url",
     "url": "https://retro-bowl-blue.vercel.app/"
+  },
+  {
+    "id": "deltarune-3wh9",
+    "title": "Deltarune",
+    "category": "Arcade",
+    "description": "",
+    "icon": "https://logos.fandom.com/wiki/Deltarune",
+    "kind": "url",
+    "url": "https://deltarune-lilac.vercel.app/"
   }
 ]
