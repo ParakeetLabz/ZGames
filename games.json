@@ -17,7 +17,7 @@
     "kind": "url",
     "url": "https://gust-zeta.vercel.app/",
     "servers": [
-      "https://mathquiz22.vercel.app"
+      "https://mathquiz22.vercel.app/index?cache=1736167363"
     ]
   },
   {
