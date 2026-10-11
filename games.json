@@ -76,7 +76,7 @@
     "title": "Deltarune",
     "category": "Arcade",
     "description": "",
-    "icon": "https://logos.fandom.com/wiki/Deltarune",
+    "icon": "icons/deltarune-3wh9.webp",
     "kind": "url",
     "url": "https://deltarune-lilac.vercel.app/"
   }
