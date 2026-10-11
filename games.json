@@ -9,13 +9,16 @@
     "url": "https://angry-birds-theta-jade.vercel.app/"
   },
   {
+    "id": "gust",
+    "title": "GUST",
     "category": "Other",
     "description": "A Proxy",
     "icon": "",
-    "id": "gust",
     "kind": "url",
-    "title": "GUST",
-    "url": "https://gust-zeta.vercel.app/"
+    "url": "https://gust-zeta.vercel.app/",
+    "servers": [
+      "https://studingplace.vercel.app"
+    ]
   },
   {
     "category": "Arcade",
