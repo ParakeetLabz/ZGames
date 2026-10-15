@@ -24,8 +24,22 @@
     return `<div class="${cls} icon-fallback" aria-hidden="true">${ch}</div>`;
   }
 
-  fetch('games.json', { cache: 'no-store' })
-    .then(r => r.json())
+  async function loadGames() {
+    // Supabase first (managed in the admin panel), games.json as fallback.
+    try {
+      const cfg = window.ZG_SUPABASE || {};
+      if (cfg.url && cfg.anonKey && window.supabase) {
+        const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+        const { data, error } = await sb.from('games').select('*').order('created_at');
+        if (!error && data && data.length) return data;
+      }
+    } catch (e) {}
+    const r = await fetch('games.json', { cache: 'no-store' });
+    const data = await r.json();
+    return Array.isArray(data) ? data : [];
+  }
+
+  loadGames()
     .then(games => {
       const game = games.find(g => g.id === id);
       if (!game) {
