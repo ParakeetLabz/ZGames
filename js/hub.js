@@ -59,8 +59,22 @@
     setTimeout(() => el.classList.add('done'), Math.max(0, 900 - (Date.now() - t0)));
   }
 
-  fetch('games.json', { cache: 'no-store' })
-    .then(r => r.json())
-    .then(data => { games = Array.isArray(data) ? data : []; render(); hideLoader(); })
+  async function loadGames() {
+    // Supabase first (managed in the admin panel), games.json as fallback.
+    try {
+      const cfg = window.ZG_SUPABASE || {};
+      if (cfg.url && cfg.anonKey && window.supabase) {
+        const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+        const { data, error } = await sb.from('games').select('*').order('created_at');
+        if (!error && data && data.length) return data;
+      }
+    } catch (e) {}
+    const r = await fetch('games.json', { cache: 'no-store' });
+    const data = await r.json();
+    return Array.isArray(data) ? data : [];
+  }
+
+  loadGames()
+    .then(data => { games = data; render(); hideLoader(); })
     .catch(() => { grid.innerHTML = `<div class="no-results">Could not load games.</div>`; hideLoader(); });
 })();
