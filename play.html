@@ -54,10 +54,10 @@
 .loader-sub{margin-top:10px;font-size:12px;font-weight:700;letter-spacing:6px;color:rgba(255,255,255,.65)}
 .loader-sub::after{content:'';animation:dots 1.2s steps(1) infinite}
 @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
-</style>
+.loader-icon{position:relative;margin-top:8px;transform-origin:top center;animation:wordsquash 1.3s cubic-bezier(.45,0,.55,1) infinite}.lic-img{width:76px;height:76px;border-radius:20px;object-fit:cover;box-shadow:0 8px 24px rgba(0,0,0,.45);background:rgba(255,255,255,.08)}.lic-letter{width:76px;height:76px;border-radius:20px;margin:0 auto;background:linear-gradient(135deg,#2e9df0,#8b5cf6);color:#fff;font:800 38px/76px system-ui,-apple-system,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.45)}</style>
 </head>
 <body>
-<div id="loader" aria-hidden="true"><div class="loader-bg"></div><div class="loader-particles"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="loader-inner"><div class="loader-zwrap"><span class="lz">Z</span><span class="lz ghost g1" aria-hidden="true">Z</span><span class="lz ghost g2" aria-hidden="true">Z</span></div><div class="loader-word"><span>g</span><span>a</span><span>m</span><span>e</span><span>s</span><div class="burst"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class="loader-shadow"></div><div class="loader-bar"><span></span></div><div class="loader-sub">LOADING</div></div></div>
+<div id="loader" aria-hidden="true"><div class="loader-bg"></div><div class="loader-particles"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="loader-inner"><div class="loader-zwrap"><span class="lz">Z</span><span class="lz ghost g1" aria-hidden="true">Z</span><span class="lz ghost g2" aria-hidden="true">Z</span></div><div class="loader-icon" id="loaderIconWrap"><div class="burst"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class="loader-shadow"></div><div class="loader-bar"><span></span></div><div class="loader-sub">LOADING</div></div></div>
 
 <header class="topbar">
   <a class="brand" href="hub.html">
