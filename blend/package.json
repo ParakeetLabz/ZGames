@@ -1,0 +1,1 @@
+{"dependencies":{"express":"^4.19.2","ws":"^8.18.0"},"description":"Blend and Seek — 3D multiplayer hide-and-seek. Paint yourself to blend in.","engines":{"node":">=18"},"main":"server.js","name":"blend-and-seek","scripts":{"start":"node server.js"},"version":"1.0.0"}
