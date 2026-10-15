@@ -35,6 +35,7 @@
         return;
       }
       title.textContent = game.title;
+      setupLoaderIcon(game);
       frame.src = game.url;
       if (/^https?:/i.test(game.url)) { newTab.href = game.url; newTab.hidden = false; }
       setupServers(game);
@@ -43,6 +44,24 @@
       ).join('');
     })
     .catch(() => { title.textContent = 'Could not load game'; hideLoader(); });
+
+  function setupLoaderIcon(game) {
+    const wrap = document.getElementById('loaderIconWrap');
+    if (!wrap || wrap.dataset.done) return;
+    wrap.dataset.done = '1';
+    let el;
+    if (game.icon) {
+      el = document.createElement('img');
+      el.className = 'lic-img';
+      el.alt = '';
+      el.src = game.icon;
+    } else {
+      el = document.createElement('div');
+      el.className = 'lic-letter';
+      el.textContent = (game.title || '?').trim().charAt(0).toUpperCase() || '?';
+    }
+    wrap.prepend(el);
+  }
 
   function setupServers(game) {
     const list = [{ name: 'Server 1', url: game.url }];
