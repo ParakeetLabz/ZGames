@@ -36,43 +36,34 @@
   .row-sub { font-size:12px; color:var(--muted); word-break:break-all; }
   #status { font-size:13px; color:var(--cyan); margin-top:10px; min-height:18px; }
   #gate { text-align:center; padding-top:10vh; }
-  #gate input { max-width:220px; margin:12px auto 0; text-align:center; font-size:20px;
-    letter-spacing:8px; }
+  #gate .panel { text-align:left; }
+  #gate label { max-width:300px; margin-left:auto; margin-right:auto; }
+  #gateMsg { text-align:center; }
   .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:0 14px; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div id="gate" class="panel">
-    <h2>🔒 Hub Admin</h2>
-    <p class="hint">Enter PIN</p>
-    <input id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off">
-    <div><button id="pinBtn" class="btn btn-p">Unlock</button></div>
-    <p id="gateMsg" class="hint"></p>
+  <div id="gate">
+    <div class="panel">
+      <h2 style="text-align:center">🔒 Hub Admin</h2>
+      <p class="hint" style="text-align:center">Sign in with your Z Games admin account</p>
+      <label>Username<input id="liUser" type="text" autocomplete="username"></label>
+      <label>Password<input id="liPass" type="password" autocomplete="current-password"></label>
+      <div style="text-align:center"><button id="loginBtn" class="btn btn-p">Sign in</button></div>
+      <p id="gateMsg" class="hint"></p>
+    </div>
   </div>
 
   <div id="app" hidden>
-    <div class="panel">
-      <h2>⚙️ GitHub connection</h2>
-      <div class="grid2">
-        <label>Owner<input id="owner" type="text" placeholder="IAmTheGamer-sigma"></label>
-        <label>Repo<input id="repo" type="text" placeholder="GameHub"></label>
+    <div class="panel topbar">
+      <div>
+        <h2 style="margin-bottom:4px">👑 Hub Admin</h2>
+        <p class="hint" id="whoLine" style="margin-top:0"></p>
       </div>
-      <label>Personal Access Token (repo scope)
-        <input id="pat" type="password" placeholder="ghp_…" autocomplete="off">
-        <span class="hint">Saved only in this browser — it can't be synced without exposing it. Tip: keep it in your password manager (iCloud Keychain / Google Passwords) so you can fill it in on any device. Create at github.com → Settings → Developer settings → Personal access tokens (classic), with <b>repo</b> scope.</span>
-      </label>
-      <button id="saveCfg" class="btn btn-p">Save &amp; Load Games</button>
-      <div id="status"></div>
-    </div>
-
-    <div class="panel">
-      <h2>🔑 Supabase (accounts)</h2>
-      <label>Supabase URL<input id="sbUrl" type="url" placeholder="https://xyz.supabase.co"></label>
-      <label>Anon public key<input id="sbKey" type="text" placeholder="eyJ…" autocomplete="off"></label>
-      <button id="saveSb" class="btn btn-p">Save</button>
-      <p class="hint">Writes js/supabase-config.js in the repo. Setup steps: SUPABASE.md</p>
+      <button id="logoutBtn" class="btn btn-g">Log out</button>
     </div>
 
     <div class="panel">
@@ -91,6 +82,7 @@
         <button class="btn btn-p" type="submit" id="saveBtn">Add Game</button>
         <button class="btn btn-g" type="button" id="cancelEdit" hidden>Cancel</button>
       </form>
+      <div id="status"></div>
     </div>
 
     <div class="panel">
@@ -100,176 +92,137 @@
   </div>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const PIN = '4173'; // obscurity only
-const status = m => { $('status').textContent = m; };
-
-if (sessionStorage.getItem('zg_admin') === '1') unlock();
-$('pinBtn').onclick = () => {
-  if ($('pin').value === PIN) { sessionStorage.setItem('zg_admin', '1'); unlock(); }
-  else $('gateMsg').textContent = 'Wrong PIN';
-};
-$('pin').addEventListener('keydown', e => { if (e.key === 'Enter') $('pinBtn').click(); });
-
-function unlock() { $('gate').hidden = true; $('app').hidden = false; loadCfg(); refresh(); loadSb(); }
-function loadCfg() {
-  $('owner').value = localStorage.getItem('zg_owner') || 'IAmTheGamer-sigma';
-  $('repo').value = localStorage.getItem('zg_repo') || 'GameHub';
-  $('pat').value = localStorage.getItem('zg_pat') || '';
-}
-$('saveCfg').onclick = () => {
-  localStorage.setItem('zg_owner', $('owner').value.trim());
-  localStorage.setItem('zg_repo', $('repo').value.trim());
-  localStorage.setItem('zg_pat', $('pat').value.trim());
-  refresh();
-};
-const cfg = () => ({ owner: $('owner').value.trim(), repo: $('repo').value.trim(), pat: $('pat').value.trim() });
-
-async function gh(path, method, body) {
-  const { pat } = cfg();
-  if (!pat) throw new Error('Add your Personal Access Token first.');
-  const r = await fetch('https://api.github.com' + path, {
-    method: method || 'GET',
-    headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-    body: body ? JSON.stringify(body) : undefined
-  });
-  if (!r.ok) throw new Error('GitHub ' + r.status + ': ' + (await r.text()).slice(0, 180));
-  return r.status === 204 ? null : r.json();
-}
-const b64e = s => btoa(String.fromCharCode(...new TextEncoder().encode(s)));
-const b64d = b => new TextDecoder().decode(Uint8Array.from(atob(b), c => c.charCodeAt(0)));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const setStatus = m => { $('status').textContent = m; };
+const emailOf = u => u.trim().toLowerCase() + '@z-games.app';
 
-let catalog = [], catalogSha = null, editingId = null;
-let iconUpload = null, gameUpload = null;
+const cfg = window.ZG_SUPABASE || {};
+let sb = null;
+if (cfg.url && cfg.anonKey && window.supabase) {
+  sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+} else {
+  $('gateMsg').textContent = 'Supabase is not connected on this site.';
+}
 
-const readB64 = file => new Promise((res, rej) => {
-  const r = new FileReader();
-  r.onload = () => res(String(r.result).split(',')[1]);
-  r.onerror = rej;
-  r.readAsDataURL(file);
-});
-$('fIconFile').onchange = async e => {
-  const f = e.target.files[0];
-  iconUpload = f ? { name: f.name, b64: await readB64(f) } : null;
+/* ---------- login ---------- */
+(async () => {
+  if (!sb) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) checkAdmin(session.user);
+})();
+
+$('loginBtn').onclick = async () => {
+  if (!sb) return;
+  $('gateMsg').textContent = 'Signing in…';
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({
+      email: emailOf($('liUser').value),
+      password: $('liPass').value
+    });
+    if (error) throw new Error(error.message);
+    await checkAdmin(data.user);
+  } catch (e) { $('gateMsg').textContent = e.message || String(e); }
 };
-$('fGameFile').onchange = async e => {
-  const f = e.target.files[0];
-  gameUpload = f ? { b64: await readB64(f) } : null;
-};
+$('liPass').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
+
+async function checkAdmin(user) {
+  try {
+    const { data, error } = await sb.from('profiles').select('username').eq('id', user.id).single();
+    if (error) throw new Error(error.message);
+    if ((data.username || '').toLowerCase() !== 'fun') {
+      await sb.auth.signOut();
+      $('gateMsg').textContent = 'This account is not an admin.';
+      return;
+    }
+    $('whoLine').textContent = 'Signed in as @' + data.username + ' — changes go live instantly';
+    $('gate').hidden = true;
+    $('app').hidden = false;
+    refresh();
+  } catch (e) { $('gateMsg').textContent = 'Error: ' + (e.message || String(e)); }
+}
+
+$('logoutBtn').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+/* ---------- games ---------- */
+let catalog = [], editingId = null;
 
 async function refresh() {
-  const { owner, repo } = cfg();
-  if (!owner || !repo) { status('Enter owner + repo, then Save & Load.'); return; }
   try {
-    status('Loading games.json…');
-    const f = await gh(`/repos/${owner}/${repo}/contents/games.json`);
-    catalogSha = f.sha;
-    catalog = JSON.parse(b64d(f.content.replace(/\n/g, '')));
-    status(`Loaded ${catalog.length} games ✓`);
+    setStatus('Loading games…');
+    const { data, error } = await sb.from('games').select('*').order('created_at');
+    if (error) throw new Error(error.message);
+    catalog = data || [];
+    setStatus(`Loaded ${catalog.length} games ✓`);
   } catch (e) {
-    catalog = []; catalogSha = null;
-    status('Note: ' + e.message + ' — saving will create games.json.');
+    catalog = [];
+    setStatus('Error: ' + e.message +
+      (String(e.message).includes('relation') ? ' — run supabase_games.sql in the Supabase SQL Editor first.' : ''));
   }
   renderList();
 }
 
-async function putFile(path, b64, msg) {
-  const { owner, repo } = cfg();
-  let sha = null;
-  try { sha = (await gh(`/repos/${owner}/${repo}/contents/${path}`)).sha; } catch (e) {}
-  const body = { message: msg, content: b64 };
-  if (sha) body.sha = sha;
-  await gh(`/repos/${owner}/${repo}/contents/${path}`, 'PUT', body);
+async function uploadAsset(path, file) {
+  const { error } = await sb.storage.from('game-assets')
+    .upload(path, file, { upsert: true, contentType: file.type || undefined });
+  if (error) throw new Error(error.message);
+  return sb.storage.from('game-assets').getPublicUrl(path).data.publicUrl;
 }
-async function delFile(path, msg) {
-  const { owner, repo } = cfg();
-  try {
-    const sha = (await gh(`/repos/${owner}/${repo}/contents/${path}`)).sha;
-    await gh(`/repos/${owner}/${repo}/contents/${path}`, 'DELETE', { message: msg, sha });
-  } catch (e) {}
-}
-async function saveCatalog(msg) {
-  const { owner, repo } = cfg();
-  const body = { message: msg, content: b64e(JSON.stringify(catalog, null, 2)) };
-  if (catalogSha) body.sha = catalogSha;
-  const f = await gh(`/repos/${owner}/${repo}/contents/games.json`, 'PUT', body);
-  catalogSha = f.content.sha;
+
+function storagePath(url) {
+  const m = String(url || '').match(/\/storage\/v1\/object\/public\/game-assets\/(.+)$/);
+  return m ? m[1] : null;
 }
 
 function resetForm() {
   $('gameForm').reset();
-  editingId = null; iconUpload = null; gameUpload = null;
+  editingId = null;
   $('formTitle').textContent = '➕ Add a game';
   $('saveBtn').textContent = 'Add Game';
   $('cancelEdit').hidden = true;
 }
 $('cancelEdit').onclick = resetForm;
 
-/* ---------- Supabase config ---------- */
-async function loadSb() {
-  try {
-    const { owner, repo } = cfg();
-    if (!owner || !repo || !cfg().pat) return;
-    const f = await gh(`/repos/${owner}/${repo}/contents/js/supabase-config.js`);
-    const txt = b64d(f.content.replace(/\n/g, ''));
-    const u = txt.match(/url:\s*['"]([^'"]*)['"]/);
-    const k = txt.match(/anonKey:\s*['"]([^'"]*)['"]/);
-    if (u) $('sbUrl').value = u[1];
-    if (k) $('sbKey').value = k[1];
-  } catch (e) {}
-}
-$('saveSb').onclick = async () => {
-  const url = $('sbUrl').value.trim().replace(/'/g, "\\'");
-  const key = $('sbKey').value.trim().replace(/'/g, "\\'");
-  const content = `/* Z Games Supabase config — set via the admin panel (Supabase section). */
-/* The anon key is public by design; RLS policies protect the data. */
-window.ZG_SUPABASE = {
-  url: '${url}',
-  anonKey: '${key}'
-};
-`;
-  try {
-    status('Saving Supabase config…');
-    await putFile('js/supabase-config.js', b64e(content), 'Update Supabase config');
-    status('Saved ✓ — accounts go live after Netlify rebuilds (~1 min)');
-  } catch (err) { status('Error: ' + err.message); }
-};
-
-$('gameForm').onsubmit = async e => {  e.preventDefault();
+$('gameForm').onsubmit = async e => {
+  e.preventDefault();
   const title = $('fTitle').value.trim();
   if (!title) return alert('Title needed');
   const url = $('fUrl').value.trim();
-  if (!url && !gameUpload) return alert('Add a game URL or upload an .html file.');
+  const gameFile = $('fGameFile').files[0];
+  const iconFile = $('fIconFile').files[0];
+  if (!url && !gameFile) return alert('Add a game URL or upload an .html file.');
   const id = editingId || (title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') +
     '-' + Math.random().toString(36).slice(2, 6));
   try {
-    status('Working…');
+    setStatus('Working…');
     let icon = $('fIconUrl').value.trim();
     let kind = 'url', finalUrl = url;
-    if (iconUpload) {
-      const ext = (iconUpload.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
-      const p = `icons/${id}.${ext}`;
-      await putFile(p, iconUpload.b64, `Icon for ${title}`);
-      icon = p;
+    if (iconFile) {
+      const ext = (iconFile.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
+      icon = await uploadAsset(`icons/${id}.${ext}`, iconFile);
     }
-    if (gameUpload) {
-      const p = `games/${id}/index.html`;
-      await putFile(p, gameUpload.b64, `Game files for ${title}`);
-      kind = 'file'; finalUrl = p;
+    if (gameFile) {
+      finalUrl = await uploadAsset(`games/${id}.html`, gameFile);
+      kind = 'file';
     }
-    const entry = { id, title, category: $('fCat').value.trim() || 'Other',
-      description: $('fDesc').value.trim(), icon, kind, url: finalUrl };
-    const servers = $('fServers').value.split('\n').map(s => s.trim()).filter(Boolean);
-    if (servers.length) entry.servers = servers;
-    catalog = editingId ? catalog.map(g => g.id === editingId ? entry : g) : [...catalog, entry];
-    await saveCatalog((editingId ? 'Update ' : 'Add ') + title);
-    status('Saved ✓ — live after Netlify rebuilds (auto, ~1 min)');
-    resetForm(); renderList();
-  } catch (err) { status('Error: ' + err.message); }
+    const servers = $('fServers').value.split('\n').map(s => s.trim()).filter(Boolean)
+      .map((u, i) => ({ name: 'Server ' + (i + 2), url: u }));
+    const entry = {
+      id, title,
+      category: $('fCat').value.trim() || 'Other',
+      description: $('fDesc').value.trim(),
+      icon, kind, url: finalUrl, servers
+    };
+    const { error } = await sb.from('games').upsert(entry, { onConflict: 'id' });
+    if (error) throw new Error(error.message);
+    setStatus('Saved ✓ — live now');
+    resetForm(); refresh();
+  } catch (err) { setStatus('Error: ' + (err.message || String(err))); }
 };
 
 function thumb(g) {
@@ -294,15 +247,18 @@ function renderList() {
   $('gameList').querySelectorAll('[data-del]').forEach(b =>
     b.onclick = async () => {
       const g = catalog.find(x => x.id === b.dataset.del);
-      if (!confirm(`Delete "${g.title}"?`)) return;
+      if (!g || !confirm(`Delete "${g.title}"?`)) return;
       try {
-        status('Deleting…');
-        if (g.kind === 'file' && g.url) await delFile(g.url, `Remove game ${g.title}`);
-        if (g.icon && !/^https?:/i.test(g.icon)) await delFile(g.icon, `Remove icon ${g.title}`);
-        catalog = catalog.filter(x => x.id !== g.id);
-        await saveCatalog('Remove ' + g.title);
-        status('Deleted ✓'); renderList();
-      } catch (err) { status('Error: ' + err.message); }
+        setStatus('Deleting…');
+        const paths = [storagePath(g.icon), storagePath(g.url)].filter(Boolean);
+        if (paths.length) {
+          const { error } = await sb.storage.from('game-assets').remove(paths);
+          if (error) throw new Error(error.message);
+        }
+        const { error } = await sb.from('games').delete().eq('id', g.id);
+        if (error) throw new Error(error.message);
+        setStatus('Deleted ✓'); refresh();
+      } catch (err) { setStatus('Error: ' + (err.message || String(err))); }
     });
 }
 
@@ -313,10 +269,9 @@ function startEdit(id) {
   $('fTitle').value = g.title;
   $('fCat').value = g.category || '';
   $('fDesc').value = g.description || '';
-  $('fIconUrl').value = /^https?:/i.test(g.icon || '') ? g.icon : '';
-  $('fUrl').value = g.kind === 'url' ? (g.url || '') : '';
+  $('fIconUrl').value = g.icon || '';
+  $('fUrl').value = g.url || '';
   $('fServers').value = (g.servers || []).map(s => typeof s === 'string' ? s : s.url).join('\n');
-  iconUpload = null; gameUpload = null;
   $('formTitle').textContent = '✏️ Edit game';
   $('saveBtn').textContent = 'Save Changes';
   $('cancelEdit').hidden = false;
