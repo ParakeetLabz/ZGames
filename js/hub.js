@@ -74,7 +74,11 @@
     return Array.isArray(data) ? data : [];
   }
 
-  loadGames()
-    .then(data => { games = data; render(); hideLoader(); })
-    .catch(() => { grid.innerHTML = `<div class="no-results">Could not load games.</div>`; hideLoader(); });
+  function refresh() {
+    loadGames()
+      .then(data => { games = data; render(); hideLoader(); })
+      .catch(() => { grid.innerHTML = `<div class="no-results">Could not load games.</div>`; hideLoader(); });
+  }
+  refresh();
+  window.addEventListener('zg:games-changed', refresh);
 })();
