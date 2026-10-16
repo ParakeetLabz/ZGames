@@ -47,7 +47,7 @@
   tabLogin.addEventListener('click', () => showTab('login'));
   tabSignup.addEventListener('click', () => showTab('signup'));
 
-  const APP_VERSION = 'v10';
+  const APP_VERSION = 'v11';
   function showProfile(username, avatar, border, onLogout, onSaveAvatar, onSaveBorder) {
     tabs.hidden = true;
     formLogin.hidden = true;
