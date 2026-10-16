@@ -106,11 +106,13 @@
       }
       const servers = $('asbServers').value.split('\n').map(s => s.trim()).filter(Boolean)
         .map((u, i) => ({ name: 'Server ' + (i + 2), url: u }));
+      const tags = $('asbTags').value.trim().split(/[,\s]+/).map(t => t.replace(/^#+/, ''))
+        .filter(t => t.length > 0 && t.length <= 20).join(' ');
       const entry = {
         id, title,
         category: $('asbCat').value.trim() || 'Other',
         description: $('asbDesc').value.trim(),
-        icon, kind, url: finalUrl, servers
+        icon, kind, url: finalUrl, servers, tags
       };
       const { error } = await sb.from('games').upsert(entry, { onConflict: 'id' });
       if (error) throw new Error(error.message);
@@ -168,6 +170,7 @@
     $('asbTitle').value = g.title;
     $('asbCat').value = g.category || '';
     $('asbDesc').value = g.description || '';
+    $('asbTags').value = g.tags || '';
     $('asbIconUrl').value = g.icon || '';
     $('asbUrl').value = g.url || '';
     $('asbServers').value = (g.servers || []).map(s => typeof s === 'string' ? s : s.url).join('\n');
