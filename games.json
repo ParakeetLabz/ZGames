@@ -1,24 +1,21 @@
 [
   {
-    "id": "angry-birds",
-    "title": "Angry Birds",
     "category": "Arcade",
     "description": "",
-    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPmEUzMrGwpyQ9mVdpNG2hlfuWu5FzvPDkRw&s",
+    "icon": "",
+    "id": "angry-birds",
     "kind": "url",
+    "title": "Angry Birds",
     "url": "https://angry-birds-theta-jade.vercel.app/"
   },
   {
-    "id": "gust",
-    "title": "GUST",
     "category": "Other",
     "description": "A Proxy",
     "icon": "",
+    "id": "gust",
     "kind": "url",
-    "url": "https://gust-zeta.vercel.app/",
-    "servers": [
-      "https://mathquiz22.vercel.app/index?cache=1736167363"
-    ]
+    "title": "GUST",
+    "url": "https://gust-zeta.vercel.app/"
   },
   {
     "category": "Arcade",
@@ -39,48 +36,39 @@
     "url": "https://funworxs.onrender.com/"
   },
   {
-    "id": "snow-rider-shpn",
-    "title": "Snow Rider",
-    "category": "Other",
-    "description": "",
-    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWKwtlpK8bpycgETENAu7hoAm2_cv26HKZaWYO4vOlfw&s",
+    "id": "phet-arithmetic",
+    "title": "PhET Arithmetic",
+    "description": "Math practice from the University of Colorado",
+    "category": "Learning",
     "kind": "url",
-    "url": "https://snow-rider-1.vercel.app/"
+    "url": "https://phet.colorado.edu/sims/html/arithmetic/latest/arithmetic_en.html",
+    "icon": ""
   },
   {
-    "id": "undertale-icp6",
-    "title": "Undertale",
-    "category": "Arcade",
-    "description": "Is it Under the Tale?",
-    "icon": "https://static.cdnlogo.com/logos/u/65/undertale.svg",
+    "id": "phet-fraction-matcher",
+    "title": "PhET Fraction Matcher",
+    "description": "Match fractions in this PhET simulation",
+    "category": "Learning",
     "kind": "url",
-    "url": "https://undertale-beige.vercel.app/"
+    "url": "https://phet.colorado.edu/sims/html/fraction-matcher/latest/fraction-matcher_en.html",
+    "icon": ""
   },
   {
-    "id": "gimkit-hacks-11fj",
-    "title": "Gimkit Hacks",
-    "category": "Other",
-    "description": "Hack in gimkit",
-    "icon": "",
+    "id": "math-master",
+    "title": "Math Master",
+    "description": "Primary math practice with progress saving (MIT)",
+    "category": "Learning",
     "kind": "url",
-    "url": "https://gim.villiansrule.xyz"
+    "url": "games/math-master/index.html",
+    "icon": ""
   },
   {
-    "id": "retro-bowl-vsup",
-    "title": "Retro Bowl",
-    "category": "Arcade",
-    "description": "Football but RETRO???",
-    "icon": "https://upload.wikimedia.org/wikipedia/en/b/bf/Retro_Bowl_cover.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail_unscaled",
+    "id": "word-search",
+    "title": "Word Search",
+    "description": "Customizable word search game (MIT)",
+    "category": "Learning",
     "kind": "url",
-    "url": "https://retro-bowl-blue.vercel.app/"
-  },
-  {
-    "id": "deltarune-3wh9",
-    "title": "Deltarune",
-    "category": "Arcade",
-    "description": "",
-    "icon": "icons/deltarune-3wh9.webp",
-    "kind": "url",
-    "url": "https://deltarune-lilac.vercel.app/"
+    "url": "games/word-search/index.html",
+    "icon": ""
   }
 ]
