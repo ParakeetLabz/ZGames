@@ -206,6 +206,12 @@ main { max-width: 1100px; margin: 0 auto; padding: 26px 20px 70px; }
   padding: 4px 10px; border-radius: 99px;
   box-shadow: 0 2px 12px rgba(34, 197, 94, .55); }
 
+/* ---------- game tags ---------- */
+.tag-pills { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }
+.tag-pill { font-size: 10px; font-weight: 700; letter-spacing: .3px; color: #8ea6ff;
+  background: rgba(142, 166, 255, .12); border: 1px solid rgba(142, 166, 255, .35);
+  padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+
 /* ---------- avatar borders ---------- */
 .avb { display: inline-flex; border-radius: 50%; padding: 3px; flex: none; }
 .avb-none { padding: 0; background: none; }
