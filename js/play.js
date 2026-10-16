@@ -39,6 +39,12 @@
     return Array.isArray(data) ? data : [];
   }
 
+  function isNew(g) {
+    if (!g.created_at) return false;
+    const t = new Date(g.created_at).getTime();
+    return !isNaN(t) && (Date.now() - t) < 7 * 24 * 60 * 60 * 1000;
+  }
+
   loadGames()
     .then(games => {
       const game = games.find(g => g.id === id);
@@ -54,7 +60,7 @@
       if (/^https?:/i.test(game.url)) { newTab.href = game.url; newTab.hidden = false; }
       setupServers(game);
       more.innerHTML = games.filter(g => g.id !== game.id).slice(0, 8).map(g =>
-        `<a class="card" href="play.html?id=${encodeURIComponent(g.id)}">${iconFor(g, 'card-icon')}<div class="card-title">${esc(g.title)}</div></a>`
+        `<a class="card" href="play.html?id=${encodeURIComponent(g.id)}">${isNew(g) ? '<span class="new-badge">NEW</span>' : ''}${iconFor(g, 'card-icon')}<div class="card-title">${esc(g.title)}</div></a>`
       ).join('');
     })
     .catch(() => { title.textContent = 'Could not load game'; hideLoader(); });
