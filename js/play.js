@@ -96,6 +96,19 @@
       el.textContent = (game.title || '?').trim().charAt(0).toUpperCase() || '?';
     }
     wrap.prepend(el);
+    // wacky random loader flavor + silly loading line, picked once per visit
+    const loader = document.getElementById('loader');
+    if (loader && !loader.dataset.flv) {
+      loader.dataset.flv = '1';
+      const flavors = ['flv-spin', 'flv-orbit', 'flv-sproing', 'flv-rave'];
+      loader.classList.add(flavors[Math.floor(Math.random() * flavors.length)]);
+      const lines = ['LOADING', 'WARMING UP PIXELS', 'SUMMONING GAMES',
+        'BRIBING THE SERVERS', 'CHARGING THE Z', 'HERDING PIXELS',
+        'DEFRAGMENTING FUN', 'INFLATING SPRITES',
+        'POLISHING THE CONTROLLERS', 'TEACHING Z NEW TRICKS'];
+      const sub = loader.querySelector('.loader-sub');
+      if (sub) sub.textContent = lines[Math.floor(Math.random() * lines.length)];
+    }
   }
 
   function setupServers(game) {
