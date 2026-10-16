@@ -47,7 +47,7 @@
   tabLogin.addEventListener('click', () => showTab('login'));
   tabSignup.addEventListener('click', () => showTab('signup'));
 
-  const APP_VERSION = 'v7';
+  const APP_VERSION = 'v8';
   function showProfile(username, avatar, border, onLogout, onSaveAvatar, onSaveBorder) {
     tabs.hidden = true;
     formLogin.hidden = true;
@@ -78,7 +78,12 @@
         <p id="pfMsg" class="hint"></p>
         <p class="hint" style="opacity:.5">version ${APP_VERSION}</p>
       </div>`;
-    const saveBorderChoice = () => {
+    let borderSaveFired = 0;
+    const saveBorderChoice = (e) => {
+      const now = Date.now();
+      if (now - borderSaveFired < 500) return; // guard against double-firing
+      borderSaveFired = now;
+      if (e && e.preventDefault) e.preventDefault();
       const b = document.getElementById('pfBorderSel').value;
       const msg = $('pfMsg');
       msg.textContent = 'Saving ' + b + '…';
@@ -86,7 +91,9 @@
       onSaveBorder(b, msg);
     };
     document.getElementById('pfBorderSel').addEventListener('change', saveBorderChoice);
-    document.getElementById('pfBorderSave').addEventListener('click', saveBorderChoice);
+    const borderBtn = document.getElementById('pfBorderSave');
+    borderBtn.addEventListener('click', saveBorderChoice);
+    borderBtn.addEventListener('touchend', saveBorderChoice, { passive: false });
     document.getElementById('pfLogout').addEventListener('click', onLogout);
     document.getElementById('pfSave').addEventListener('click', () => {
       const file = document.getElementById('pfAvatar').files[0];
