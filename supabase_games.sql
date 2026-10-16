@@ -27,6 +27,7 @@ create table if not exists public.games (
   kind text not null default 'url',
   url text not null,
   servers jsonb not null default '[]',
+  tags text not null default '',
   created_at timestamptz not null default now()
 );
 
