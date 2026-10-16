@@ -60,12 +60,15 @@
       <div class="profile">
         <span class="avb avb-${safeBorder(border)}" id="pfBorderWrap">${pic}</span>
         <h3>${esc(username)}</h3>
-        <div class="avb-pick-label">Avatar border (saves automatically)</div>
-        <label class="field"><select id="pfBorderSel">
+        <div class="avb-pick-label">Avatar border</div>
+        <div class="field"><select id="pfBorderSel">
           ${BORDERS.map(([b, label]) =>
             `<option value="${b}"${safeBorder(border) === b ? ' selected' : ''}>${label}</option>`
           ).join('')}
-        </select></label>
+        </select></div>
+        <div class="form-actions">
+          <button id="pfBorderSave" class="btn btn-primary">Set border</button>
+        </div>
         <label class="field">Change avatar<input id="pfAvatar" type="file" accept="image/*"></label>
         <div class="form-actions">
           <button id="pfSave" class="btn btn-primary">Upload image</button>
@@ -73,13 +76,15 @@
         </div>
         <p id="pfMsg" class="hint"></p>
       </div>`;
-    document.getElementById('pfBorderSel').addEventListener('change', e => {
-      const b = e.target.value;
+    const saveBorderChoice = () => {
+      const b = document.getElementById('pfBorderSel').value;
       const msg = $('pfMsg');
       msg.textContent = 'Saving ' + b + '…';
       $('pfBorderWrap').className = 'avb avb-' + b;
       onSaveBorder(b, msg);
-    });
+    };
+    document.getElementById('pfBorderSel').addEventListener('change', saveBorderChoice);
+    document.getElementById('pfBorderSave').addEventListener('click', saveBorderChoice);
     document.getElementById('pfLogout').addEventListener('click', onLogout);
     document.getElementById('pfSave').addEventListener('click', () => {
       const file = document.getElementById('pfAvatar').files[0];
