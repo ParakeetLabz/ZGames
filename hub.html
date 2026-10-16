@@ -65,6 +65,7 @@
     <span class="brand-name">Z Games</span>
   </a>
   <input id="search" class="search" type="search" placeholder="Search games...">
+  <button id="adminBtn" class="btn btn-primary" hidden>👑 Admin</button>
   <div id="accountWrap" class="account-wrap"></div>
 </header>
 <main>
@@ -103,10 +104,37 @@
   </div>
 </div>
 
+<div id="asbOverlay"></div>
+<aside id="asbPanel" aria-label="Admin panel">
+  <div class="asb-head">
+    <h2>👑 Manage Games</h2>
+    <button id="asbClose" class="asb-x" aria-label="Close">×</button>
+  </div>
+  <div class="asb-body">
+    <h3 id="asbFormTitle" class="asb-sec" style="margin-top:0">➕ Add a game</h3>
+    <form id="asbForm">
+      <label class="field">Title<input id="asbTitle" type="text" required maxlength="60"></label>
+      <label class="field">Category<input id="asbCat" type="text" placeholder="Arcade"></label>
+      <label class="field">Description<input id="asbDesc" type="text" maxlength="140"></label>
+      <label class="field">Icon — image URL<input id="asbIconUrl" type="url" placeholder="https://…"></label>
+      <label class="field">Icon — or upload image<input id="asbIconFile" type="file" accept="image/*"></label>
+      <label class="field">Game URL (embedded)<input id="asbUrl" type="url" placeholder="https://…"></label>
+      <label class="field">Game — or upload .html file<input id="asbGameFile" type="file" accept=".html,text/html"></label>
+      <label class="field">Extra servers — one URL per line<textarea id="asbServers" rows="2" placeholder="https://backup-server…"></textarea></label>
+      <button class="btn btn-primary" type="submit" id="asbSave">Add Game</button>
+      <button class="btn btn-ghost" type="button" id="asbCancel" hidden>Cancel</button>
+    </form>
+    <div id="asbStatus" class="asb-status"></div>
+    <h3 class="asb-sec">🎮 Games</h3>
+    <div id="asbList"></div>
+  </div>
+</aside>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/hub.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/admin-sidebar.js"></script>
 <script>setTimeout(function(){var l=document.getElementById("loader");if(l)l.classList.add("done")},6000);</script>
 </body>
 </html>
