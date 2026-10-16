@@ -47,7 +47,7 @@
   tabLogin.addEventListener('click', () => showTab('login'));
   tabSignup.addEventListener('click', () => showTab('signup'));
 
-  const APP_VERSION = 'v9';
+  const APP_VERSION = 'v10';
   function showProfile(username, avatar, border, onLogout, onSaveAvatar, onSaveBorder) {
     tabs.hidden = true;
     formLogin.hidden = true;
@@ -97,9 +97,43 @@
 
   async function uploadAvatar(uid, file) {
     const path = uid + '/avatar.png';
-    const { error } = await sb.storage.from('avatars').upload(path, file, { upsert: true });
+    // Resize large images down to 512px max before upload (iPhone photos are huge)
+    let uploadFile = file;
+    try {
+      uploadFile = await resizeImage(file, 512);
+    } catch (e) { /* fall back to original file */ }
+    const uploadPromise = sb.storage.from('avatars').upload(path, uploadFile, { upsert: true, contentType: 'image/png' });
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Upload timed out after 30s. Try a smaller image.')), 30000));
+    const { error } = await Promise.race([uploadPromise, timeoutPromise]);
     if (error) throw new Error(error.message);
     return sb.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+  }
+
+  function resizeImage(file, maxSize) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(img.src);
+        let { width, height } = img;
+        if (width <= maxSize && height <= maxSize) {
+          // Already small enough; convert to PNG blob anyway for consistency
+        }
+        const scale = Math.min(1, maxSize / Math.max(width, height));
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        canvas.toBlob(blob => {
+          if (blob) resolve(blob);
+          else reject(new Error('Could not process image.'));
+        }, 'image/png');
+      };
+      img.onerror = () => reject(new Error('Could not read image file.'));
+      img.src = URL.createObjectURL(file);
+    });
   }
 
   formSignup.addEventListener('submit', async e => {
