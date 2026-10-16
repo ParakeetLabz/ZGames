@@ -76,9 +76,11 @@
     profileView.querySelectorAll('.avb-pick-opt').forEach(sw =>
       sw.addEventListener('click', () => {
         const b = sw.dataset.b;
+        const msg = $('pfMsg');
+        msg.textContent = 'Saving ' + b + '…';
         profileView.querySelectorAll('.avb-pick-opt').forEach(x => x.classList.toggle('sel', x === sw));
         $('pfBorderWrap').className = 'avb avb-' + b;
-        onSaveBorder(b, $('pfMsg'));
+        onSaveBorder(b, msg);
       }));
     document.getElementById('pfLogout').addEventListener('click', onLogout);
     document.getElementById('pfSave').addEventListener('click', () => {
@@ -171,8 +173,9 @@
           try {
             const { error } = await sb.from('profiles').update({ avatar_border: b }).eq('id', session.user.id);
             if (error) throw new Error(error.message);
+            msgEl.textContent = 'Border saved ✓';
             await refresh();
-          } catch (err) { msgEl.textContent = err.message || String(err); }
+          } catch (err) { msgEl.textContent = 'Save failed: ' + (err.message || String(err)); }
         }
       );
       openModal();
