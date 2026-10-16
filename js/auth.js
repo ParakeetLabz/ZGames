@@ -60,7 +60,7 @@
       <div class="profile">
         <span class="avb avb-${safeBorder(border)}" id="pfBorderWrap">${pic}</span>
         <h3>${esc(username)}</h3>
-        <div class="avb-pick-label">Avatar border</div>
+        <div class="avb-pick-label">Avatar border (saves automatically)</div>
         <label class="field"><select id="pfBorderSel">
           ${BORDERS.map(([b, label]) =>
             `<option value="${b}"${safeBorder(border) === b ? ' selected' : ''}>${label}</option>`
@@ -68,7 +68,7 @@
         </select></label>
         <label class="field">Change avatar<input id="pfAvatar" type="file" accept="image/*"></label>
         <div class="form-actions">
-          <button id="pfSave" class="btn btn-primary">Save avatar</button>
+          <button id="pfSave" class="btn btn-primary">Upload image</button>
           <button id="pfLogout" class="btn btn-ghost">Log out</button>
         </div>
         <p id="pfMsg" class="hint"></p>
