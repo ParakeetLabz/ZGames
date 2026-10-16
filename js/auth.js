@@ -11,6 +11,13 @@
   const emailOf = u => u.trim().toLowerCase() + '@z-games.app'; // .app: real gTLD; GoTrue rejects reserved TLDs like .local
   const validUser = u => /^[a-zA-Z0-9_]{3,16}$/.test(u.trim());
 
+  const BORDERS = [
+    ['none', 'None'], ['gold', 'Gold'], ['neon', 'Neon'], ['fire', 'Fire'],
+    ['ice', 'Ice'], ['rainbow', 'Rainbow'], ['shadow', 'Shadow']
+  ];
+  const safeBorder = b => BORDERS.some(([x]) => x === b) ? b : 'none';
+  const avb = (inner, border) => `<span class="avb avb-${safeBorder(border)}">${inner}</span>`;
+
   const modal = document.getElementById('authModal');
   const authBody = document.getElementById('authBody');
   const tabs = document.getElementById('authTabs');
@@ -40,16 +47,25 @@
   tabLogin.addEventListener('click', () => showTab('login'));
   tabSignup.addEventListener('click', () => showTab('signup'));
 
-  function showProfile(username, avatar, onLogout, onSaveAvatar) {
+  function showProfile(username, avatar, border, onLogout, onSaveAvatar, onSaveBorder) {
     tabs.hidden = true;
     formLogin.hidden = true;
     formSignup.hidden = true;
     profileView.hidden = false;
     authMsg('');
+    const pic = avatar
+      ? `<img class="acct-big" src="${esc(avatar)}" alt="">`
+      : `<div class="acct-big acct-fb">${esc(username.trim().charAt(0).toUpperCase())}</div>`;
     profileView.innerHTML = `
       <div class="profile">
-        ${avatar ? `<img class="acct-big" src="${esc(avatar)}" alt="">` : `<div class="acct-big acct-fb">${esc(username.trim().charAt(0).toUpperCase())}</div>`}
+        <span class="avb avb-${safeBorder(border)}" id="pfBorderWrap">${pic}</span>
         <h3>${esc(username)}</h3>
+        <div class="avb-pick-label">Avatar border</div>
+        <div class="avb-pick">
+          ${BORDERS.map(([b, label]) =>
+            `<button type="button" class="avb-pick-opt avb-${b}${safeBorder(border) === b ? ' sel' : ''}" data-b="${b}" title="${label}"></button>`
+          ).join('')}
+        </div>
         <label class="field">Change avatar<input id="pfAvatar" type="file" accept="image/*"></label>
         <div class="form-actions">
           <button id="pfSave" class="btn btn-primary">Save avatar</button>
@@ -57,6 +73,13 @@
         </div>
         <p id="pfMsg" class="hint"></p>
       </div>`;
+    profileView.querySelectorAll('.avb-pick-opt').forEach(sw =>
+      sw.addEventListener('click', () => {
+        const b = sw.dataset.b;
+        profileView.querySelectorAll('.avb-pick-opt').forEach(x => x.classList.toggle('sel', x === sw));
+        $('pfBorderWrap').className = 'avb avb-' + b;
+        onSaveBorder(b, $('pfMsg'));
+      }));
     document.getElementById('pfLogout').addEventListener('click', onLogout);
     document.getElementById('pfSave').addEventListener('click', () => {
       const file = document.getElementById('pfAvatar').files[0];
@@ -118,19 +141,21 @@
     }
     let username = (session.user.user_metadata && session.user.user_metadata.username) || 'player';
     let avatar = null;
+    let border = 'none';
     try {
-      const { data } = await sb.from('profiles').select('username,avatar_url')
+      const { data } = await sb.from('profiles').select('username,avatar_url,avatar_border')
         .eq('id', session.user.id).single();
-      if (data) { username = data.username || username; avatar = data.avatar_url; }
+      if (data) { username = data.username || username; avatar = data.avatar_url; border = data.avatar_border || 'none'; }
     } catch (e) {}
-    const pic = avatar
+    const pic = avb(avatar
       ? `<img class="acct-pic" src="${esc(avatar)}" alt="">`
-      : `<span class="acct-fb">${esc(username.trim().charAt(0).toUpperCase())}</span>`;
+      : `<span class="acct-fb">${esc(username.trim().charAt(0).toUpperCase())}</span>`, border);
     wrap.innerHTML = `<button id="accountBtn" class="acct-chip">${pic}<span>${esc(username)}</span></button>`;
     document.getElementById('accountBtn').addEventListener('click', () => {
       showProfile(
         username,
         avatar,
+        border,
         async () => { await sb.auth.signOut(); closeModal(); await refresh(); },
         async (file, msgEl) => {
           if (!file) { msgEl.textContent = 'Pick an image first.'; return; }
@@ -140,6 +165,13 @@
             const { error } = await sb.from('profiles').update({ avatar_url: url }).eq('id', session.user.id);
             if (error) throw new Error(error.message);
             closeModal(); await refresh();
+          } catch (err) { msgEl.textContent = err.message || String(err); }
+        },
+        async (b, msgEl) => {
+          try {
+            const { error } = await sb.from('profiles').update({ avatar_border: b }).eq('id', session.user.id);
+            if (error) throw new Error(error.message);
+            await refresh();
           } catch (err) { msgEl.textContent = err.message || String(err); }
         }
       );
