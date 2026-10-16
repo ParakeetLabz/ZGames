@@ -2,7 +2,7 @@
   {
     "category": "Arcade",
     "description": "",
-    "icon": "",
+    "icon": "icons/angry-birds.webp",
     "id": "angry-birds",
     "kind": "url",
     "title": "Angry Birds",
@@ -11,7 +11,7 @@
   {
     "category": "Other",
     "description": "A Proxy",
-    "icon": "",
+    "icon": "icons/gust.webp",
     "id": "gust",
     "kind": "url",
     "title": "GUST",
@@ -20,7 +20,7 @@
   {
     "category": "Arcade",
     "description": "A Multiplayer blocky game",
-    "icon": "",
+    "icon": "icons/funtopia.webp",
     "id": "funtopia",
     "kind": "url",
     "title": "FunTopia",
@@ -29,46 +29,10 @@
   {
     "category": "Other",
     "description": "A chatting app for FunTopia",
-    "icon": "",
+    "icon": "icons/funworxs.webp",
     "id": "funworxs",
     "kind": "url",
     "title": "FunWorxs",
     "url": "https://funworxs.onrender.com/"
-  },
-  {
-    "id": "phet-arithmetic",
-    "title": "PhET Arithmetic",
-    "description": "Math practice from the University of Colorado",
-    "category": "Learning",
-    "kind": "url",
-    "url": "https://phet.colorado.edu/sims/html/arithmetic/latest/arithmetic_en.html",
-    "icon": ""
-  },
-  {
-    "id": "phet-fraction-matcher",
-    "title": "PhET Fraction Matcher",
-    "description": "Match fractions in this PhET simulation",
-    "category": "Learning",
-    "kind": "url",
-    "url": "https://phet.colorado.edu/sims/html/fraction-matcher/latest/fraction-matcher_en.html",
-    "icon": ""
-  },
-  {
-    "id": "math-master",
-    "title": "Math Master",
-    "description": "Primary math practice with progress saving (MIT)",
-    "category": "Learning",
-    "kind": "url",
-    "url": "games/math-master/index.html",
-    "icon": ""
-  },
-  {
-    "id": "word-search",
-    "title": "Word Search",
-    "description": "Customizable word search game (MIT)",
-    "category": "Learning",
-    "kind": "url",
-    "url": "games/word-search/index.html",
-    "icon": ""
   }
 ]
