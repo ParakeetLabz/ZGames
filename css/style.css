@@ -194,3 +194,6 @@ main { max-width: 1100px; margin: 0 auto; padding: 26px 20px 70px; }
   margin: 18px 0 10px; text-transform: uppercase; }
 #adminBtn { flex: none; }
 @media (max-width: 560px) { #adminBtn { padding: 8px 12px; font-size: 13px; } }
+
+/* hidden attribute must win over class display rules (e.g. .btn) */
+[hidden] { display: none !important; }
