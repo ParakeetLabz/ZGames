@@ -59,6 +59,23 @@
     </a>`;
   }
 
+  function recentIds() {
+    try {
+      const a = JSON.parse(localStorage.getItem('zg_recent') || '[]');
+      return Array.isArray(a) ? a.filter(x => typeof x === 'string') : [];
+    } catch (e) { return []; }
+  }
+
+  function renderRecent() {
+    const wrap = document.getElementById('recentWrap');
+    const rg = document.getElementById('recentGrid');
+    if (!wrap || !rg) return;
+    const byId = new Map(games.map(g => [g.id, g]));
+    const list = recentIds().map(id => byId.get(id)).filter(Boolean).slice(0, 8);
+    wrap.hidden = !list.length;
+    rg.innerHTML = list.map(card).join('');
+  }
+
   function render() {
     const q = query.trim().toLowerCase();
     const list = games.filter(g =>
@@ -103,7 +120,7 @@
 
   function refresh() {
     loadGames()
-      .then(data => { games = data; render(); hideLoader(); })
+      .then(data => { games = data; render(); renderRecent(); hideLoader(); })
       .catch(() => { grid.innerHTML = `<div class="no-results">Could not load games.</div>`; hideLoader(); });
   }
   refresh();
