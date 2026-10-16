@@ -45,6 +45,14 @@
     return !isNaN(t) && (Date.now() - t) < 7 * 24 * 60 * 60 * 1000;
   }
 
+  function tagPills(g) {
+    const tags = String(g.tags || '').split(/[,\s]+/).map(t => t.replace(/^#+/, '').trim())
+      .filter(t => t.length > 0 && t.length <= 20);
+    return tags.length
+      ? `<div class="tag-pills">${tags.map(t => `<span class="tag-pill">#${esc(t)}</span>`).join('')}</div>`
+      : '';
+  }
+
   loadGames()
     .then(games => {
       const game = games.find(g => g.id === id);
@@ -60,7 +68,7 @@
       if (/^https?:/i.test(game.url)) { newTab.href = game.url; newTab.hidden = false; }
       setupServers(game);
       more.innerHTML = games.filter(g => g.id !== game.id).slice(0, 8).map(g =>
-        `<a class="card" href="play.html?id=${encodeURIComponent(g.id)}">${isNew(g) ? '<span class="new-badge">NEW</span>' : ''}${iconFor(g, 'card-icon')}<div class="card-title">${esc(g.title)}</div></a>`
+        `<a class="card" href="play.html?id=${encodeURIComponent(g.id)}">${isNew(g) ? '<span class="new-badge">NEW</span>' : ''}${iconFor(g, 'card-icon')}<div class="card-title">${esc(g.title)}</div>${tagPills(g)}</a>`
       ).join('');
     })
     .catch(() => { title.textContent = 'Could not load game'; hideLoader(); });
