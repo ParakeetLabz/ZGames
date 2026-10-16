@@ -63,6 +63,13 @@
         return;
       }
       title.textContent = game.title;
+      // remember this game for the hub's "Continue playing" row
+      try {
+        const k = 'zg_recent';
+        const a = JSON.parse(localStorage.getItem(k) || '[]').filter(x => x !== game.id);
+        a.unshift(game.id);
+        localStorage.setItem(k, JSON.stringify(a.slice(0, 8)));
+      } catch (e) {}
       setupLoaderIcon(game);
       frame.src = game.url;
       if (/^https?:/i.test(game.url)) { newTab.href = game.url; newTab.hidden = false; }
