@@ -47,6 +47,7 @@
   tabLogin.addEventListener('click', () => showTab('login'));
   tabSignup.addEventListener('click', () => showTab('signup'));
 
+  const APP_VERSION = 'v7';
   function showProfile(username, avatar, border, onLogout, onSaveAvatar, onSaveBorder) {
     tabs.hidden = true;
     formLogin.hidden = true;
@@ -75,6 +76,7 @@
           <button id="pfLogout" class="btn btn-ghost">Log out</button>
         </div>
         <p id="pfMsg" class="hint"></p>
+        <p class="hint" style="opacity:.5">version ${APP_VERSION}</p>
       </div>`;
     const saveBorderChoice = () => {
       const b = document.getElementById('pfBorderSel').value;
