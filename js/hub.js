@@ -30,8 +30,15 @@
       b.addEventListener('click', () => { activeCat = b.dataset.cat; render(); }));
   }
 
+  function isNew(g) {
+    if (!g.created_at) return false;
+    const t = new Date(g.created_at).getTime();
+    return !isNaN(t) && (Date.now() - t) < 7 * 24 * 60 * 60 * 1000;
+  }
+
   function card(g) {
     return `<a class="card" href="play.html?id=${encodeURIComponent(g.id)}">
+      ${isNew(g) ? '<span class="new-badge">NEW</span>' : ''}
       ${iconFor(g, 'card-icon')}
       <div class="card-title">${esc(g.title)}</div>
       <div class="card-cat">${esc(g.category || '')}</div>
