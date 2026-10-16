@@ -198,6 +198,10 @@ main { max-width: 1100px; margin: 0 auto; padding: 26px 20px 70px; }
 /* hidden attribute must win over class display rules (e.g. .btn) */
 [hidden] { display: none !important; }
 
+/* ---------- section titles ---------- */
+.sec-title { font-size: 18px; margin: 18px 0 10px; }
+#recentWrap { margin-bottom: 6px; }
+
 /* ---------- NEW badge ---------- */
 .card { position: relative; }
 .new-badge { position: absolute; top: 10px; right: 10px; z-index: 1;
