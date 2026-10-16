@@ -36,11 +36,24 @@
     return !isNaN(t) && (Date.now() - t) < 7 * 24 * 60 * 60 * 1000;
   }
 
+  function tagsOf(g) {
+    return String(g.tags || '').split(/[,\s]+/).map(t => t.replace(/^#+/, '').trim())
+      .filter(t => t.length > 0 && t.length <= 20);
+  }
+
+  function tagPills(g) {
+    const tags = tagsOf(g);
+    return tags.length
+      ? `<div class="tag-pills">${tags.map(t => `<span class="tag-pill">#${esc(t)}</span>`).join('')}</div>`
+      : '';
+  }
+
   function card(g) {
     return `<a class="card" href="play.html?id=${encodeURIComponent(g.id)}">
       ${isNew(g) ? '<span class="new-badge">NEW</span>' : ''}
       ${iconFor(g, 'card-icon')}
       <div class="card-title">${esc(g.title)}</div>
+      ${tagPills(g)}
       <div class="card-cat">${esc(g.category || '')}</div>
       ${g.description ? `<div class="card-desc">${esc(g.description)}</div>` : ''}
     </a>`;
@@ -51,13 +64,20 @@
     const list = games.filter(g =>
       (activeCat === 'All' || (g.category || '') === activeCat) &&
       (!q || (g.title || '').toLowerCase().includes(q) ||
-        (g.description || '').toLowerCase().includes(q)));
+        (g.description || '').toLowerCase().includes(q) ||
+        tagsOf(g).some(t => t.toLowerCase().includes(q))));
     renderChips();
     grid.innerHTML = list.length ? list.map(card).join('')
       : `<div class="no-results">No games found.</div>`;
   }
 
   search.addEventListener('input', e => { query = e.target.value; render(); });
+
+  document.getElementById('randomBtn').addEventListener('click', () => {
+    if (!games.length) return;
+    const g = games[Math.floor(Math.random() * games.length)];
+    location.href = 'play.html?id=' + encodeURIComponent(g.id);
+  });
 
   const t0 = Date.now();
   function hideLoader() {
