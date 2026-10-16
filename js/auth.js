@@ -63,7 +63,7 @@
         <div class="avb-pick-label">Avatar border</div>
         <div class="avb-pick">
           ${BORDERS.map(([b, label]) =>
-            `<button type="button" class="avb-pick-opt avb-${b}${safeBorder(border) === b ? ' sel' : ''}" data-b="${b}" title="${label}"></button>`
+            `<button type="button" class="avb-pick-opt avb-${b}${safeBorder(border) === b ? ' sel' : ''}" data-b="${b}" aria-label="${label} border"></button>`
           ).join('')}
         </div>
         <label class="field">Change avatar<input id="pfAvatar" type="file" accept="image/*"></label>
