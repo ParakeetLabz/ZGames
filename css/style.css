@@ -224,3 +224,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 26px 20px 70px; }
   -webkit-tap-highlight-color: transparent; }
 .avb-pick-opt.avb-none { background: #2a3a5f; }
 .avb-pick-opt.sel { border-color: #fff; box-shadow: 0 0 0 2px var(--blue); }
+
+/* border picker dropdown */
+.field select { width: 100%; margin-top: 6px; background: var(--bg0); border: 1px solid var(--line);
+  color: var(--text); border-radius: 10px; padding: 10px 14px; font-size: 14px; outline: none; }
+.field select:focus { border-color: var(--blue); }
