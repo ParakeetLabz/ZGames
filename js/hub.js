@@ -49,14 +49,72 @@
   }
 
   function card(g) {
-    return `<a class="card" href="play.html?id=${encodeURIComponent(g.id)}">
+    const fav = isFav(g.id) ? ' on' : '';
+    return `<div class="cardwrap">
+      <a class="card" href="play.html?id=${encodeURIComponent(g.id)}">
       ${isNew(g) ? '<span class="new-badge">NEW</span>' : ''}
       ${iconFor(g, 'card-icon')}
       <div class="card-title">${esc(g.title)}</div>
       ${tagPills(g)}
       <div class="card-cat">${esc(g.category || '')}</div>
       ${g.description ? `<div class="card-desc">${esc(g.description)}</div>` : ''}
-    </a>`;
+      </a>
+      <button class="favbtn${fav}" data-fav="${esc(g.id)}" aria-label="Favorite this game" type="button">♥</button>
+    </div>`;
+  }
+
+  function favIds() {
+    try {
+      const a = JSON.parse(localStorage.getItem('zg_favs') || '[]');
+      return Array.isArray(a) ? a.filter(x => typeof x === 'string') : [];
+    } catch (e) { return []; }
+  }
+
+  function isFav(id) { return favIds().includes(id); }
+
+  function toggleFav(id) {
+    let a = favIds();
+    a = a.includes(id) ? a.filter(x => x !== id) : [id, ...a];
+    try { localStorage.setItem('zg_favs', JSON.stringify(a.slice(0, 50))); } catch (e) {}
+    const on = a.includes(id);
+    document.querySelectorAll('[data-fav]').forEach(b => {
+      if (b.getAttribute('data-fav') === id) b.classList.toggle('on', on);
+    });
+    renderFavs();
+  }
+
+  function renderFavs() {
+    const wrap = document.getElementById('favWrap');
+    const fg = document.getElementById('favGrid');
+    if (!wrap || !fg) return;
+    const byId = new Map(games.map(g => [g.id, g]));
+    const list = favIds().map(id => byId.get(id)).filter(Boolean);
+    wrap.hidden = !list.length;
+    fg.innerHTML = list.map(card).join('');
+  }
+
+  function spotlightGame() {
+    if (!games.length) return null;
+    return games[Math.floor(Date.now() / 86400000) % games.length];
+  }
+
+  function renderSpotlight() {
+    const wrap = document.getElementById('spotWrap');
+    if (!wrap) return;
+    const g = spotlightGame();
+    if (!g) { wrap.hidden = true; return; }
+    wrap.hidden = false;
+    wrap.innerHTML = `
+      <div class="spot-label">🎰 DAILY SPOTLIGHT</div>
+      <a class="spot-card" href="play.html?id=${encodeURIComponent(g.id)}">
+        ${iconFor(g, 'spot-icon')}
+        <div class="spot-info">
+          <div class="spot-title">${esc(g.title)}</div>
+          ${g.description ? `<div class="spot-desc">${esc(g.description)}</div>` : ''}
+          ${tagPills(g)}
+          <span class="spot-play">▶ Play now</span>
+        </div>
+      </a>`;
   }
 
   function recentIds() {
@@ -90,6 +148,13 @@
 
   search.addEventListener('input', e => { query = e.target.value; render(); });
 
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-fav]');
+    if (!b) return;
+    e.preventDefault();
+    toggleFav(b.getAttribute('data-fav'));
+  });
+
   document.getElementById('randomBtn').addEventListener('click', () => {
     if (!games.length) return;
     const g = games[Math.floor(Math.random() * games.length)];
@@ -120,7 +185,7 @@
 
   function refresh() {
     loadGames()
-      .then(data => { games = data; render(); renderRecent(); hideLoader(); })
+      .then(data => { games = data; render(); renderRecent(); renderFavs(); renderSpotlight(); hideLoader(); })
       .catch(() => { grid.innerHTML = `<div class="no-results">Could not load games.</div>`; hideLoader(); });
   }
   refresh();
