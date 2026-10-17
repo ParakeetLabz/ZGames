@@ -115,6 +115,17 @@
         icon, kind, url: finalUrl, servers, tags
       };
       const { error } = await sb.from('games').upsert(entry, { onConflict: 'id' });
+      if (error && /tags/i.test(error.message || '')) {
+        // tags column missing or schema cache stale — save without tags so the
+        // game still saves; tags start working once supabase_game_tags.sql is run
+        const { tags: _tagsDropped, ...entryNoTags } = entry;
+        const retry = await sb.from('games').upsert(entryNoTags, { onConflict: 'id' });
+        if (retry.error) throw new Error(retry.error.message);
+        setStatus('Saved ✓ (tags need the SQL run)');
+        resetForm(); refresh();
+        window.dispatchEvent(new CustomEvent('zg:games-changed'));
+        return;
+      }
       if (error) throw new Error(error.message);
       setStatus('Saved ✓');
       resetForm(); refresh();
